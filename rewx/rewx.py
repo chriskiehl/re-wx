@@ -6,12 +6,23 @@ from wx.lib.scrolledpanel import ScrolledPanel
 def readit22(schema):
     if not schema:
         return None
+    if isinstance(schema, dict):
+        # TODO: uhh... does this logic hold..?
+        # this has already been transformed
+        return schema
     fn, *args = schema
-    if fn.__name__ in ('text22', 'input22', 'button22', 'textctrl', 'statictext'):
+    if getattr(fn, '__name__', '') in ('text22', 'input22', 'button22', 'textctrl', 'statictext'):
         return fn(*args)
     else:
         attr, *body = args
         return fn(attr, *map(readit22, body))
+
+class Ref:
+    def __init__(self):
+        self.instance = None
+
+    def update_ref(self, instance):
+        self.instance = instance
 
 
 class Component:
@@ -20,6 +31,7 @@ class Component:
         self.state = None
 
     def setState(self, nextState):
+        #todo: this lock does nothing.. needs to be am update fn fr cas
         with threading.Lock():
             # compare and swap the states
             # reconsile changes
@@ -47,7 +59,7 @@ class Component:
 
 
 
-
+# TODO: need React.fragment style component!
 
 def updater(prevdom: wx.Window, newdom):
     """
@@ -87,7 +99,11 @@ def updater(prevdom: wx.Window, newdom):
         for child in newdom['children']:
             thunk = renderer(child)
             item = thunk(prevdom)
-            prevdom.GetSizer().Add(item)
+            prevdom.GetSizer().Add(item,
+                                   child['attrs'].get('proportion', 0),
+                                   child['attrs'].get('flag', 0),
+                                   child['attrs'].get('border', 0)
+                                   )
         # connect it to the instance
         # node: wx.Window = thunk(parent)
         parent.Layout()
@@ -228,6 +244,8 @@ def renderer(spec):
         return vblock2wx(spec)
     elif spec['type'] in ('staticline',):
         return line2wx(spec)
+    elif spec['type'] in ('grid',):
+        return grid2wx(spec)
     else:
         return block2wx(spec)
 
@@ -235,6 +253,9 @@ def renderer(spec):
 def block2wx(spec):
     def inner(parent):
         panel = wx.Panel(parent)
+        if 'ref' in spec['attrs']:
+            ref = spec['attrs']['ref']
+            ref.update_ref(panel)
         panel.xid = spec['attrs']['xid']
         if 'min_size' in spec['attrs']:
             panel.SetMinSize(spec['attrs']['min_size'])
@@ -279,7 +300,28 @@ def vblock2wx(spec):
         return panel
     return inner
 
-
+def grid2wx(spec):
+    def inner(parent):
+        panel = wx.Panel(parent)
+        panel.xid = spec['attrs']['xid']
+        if 'min_size' in spec['attrs']:
+            panel.SetMinSize(spec['attrs']['min_size'])
+        if 'max_size' in spec['attrs']:
+            panel.SetMaxSize(spec['attrs']['max_size'])
+        if 'background_color' in spec['attrs']:
+            panel.SetBackgroundColour(spec['attrs']['background_color'])
+        box = wx.GridSizer(spec['attrs'].get('cols', 1), gap=spec['attrs'].get('gap', (0, 0)))
+        for elm in spec['children']:
+            ee = renderer(elm)
+            e = ee(panel)
+            box.Add(e,
+                    elm['attrs'].get('proportion', 0),
+                    elm['attrs'].get('flag', 0),
+                    elm['attrs'].get('border', 0))
+        panel.SetSizer(box)
+        return panel
+    inner.__tt__ = 'div'
+    return inner
 
 
 def scrollblock2wx(spec):
@@ -291,10 +333,12 @@ def scrollblock2wx(spec):
         for elm in spec['children']:
             ee = renderer(elm)
             e = ee(panel)
-            box.Add(e)
+            box.Add(e,
+                    elm['attrs'].get('proportion', 0),
+                    elm['attrs'].get('flag', 0),
+                    elm['attrs'].get('border', 0))
         panel.SetSizer(box)
         return panel
-    inner.__tt__ = 'div'
     return inner
 
 
@@ -303,6 +347,7 @@ def line2wx(spec):
     def inner(parent):
         line = wx.StaticLine(parent, style=spec['attrs'].get('style', wx.LI_HORIZONTAL))
         line.SetSize(spec['attrs'].get('size', (10, 10)))
+        line.xid = spec['attrs']['xid']
         return line
     return inner
 
@@ -330,7 +375,7 @@ def textctrl2wx(spec):
         text = wx.TextCtrl(parent)
         if spec['attrs'].get('disabled', False):
             text.Disable()
-        text.SetValue(spec['attrs'].get('value'))
+        text.SetValue(spec['attrs'].get('value', ''))
         text.xid = spec['attrs']['xid']
         text.SetEditable(not spec['attrs'].get('readonly', False))
         if spec['attrs'].get('on_change'):

@@ -1,12 +1,8 @@
 import wx
 import rewx.virtualdom as v
+from examples.gooey.gooey import Screens
 from rewx.rewx import readit22
-
-
-# class Point2D(TypedDic):
-#     x: int
-#     y: int
-#     label: str
+from itertools import zip_longest
 
 
 def title_font():
@@ -16,21 +12,39 @@ def subtitle_font():
     return wx.Font(9, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
 
 
-def config_footer(props):
+def bold_font():
+    return wx.Font(9, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+
+
+def chunk(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
+
+def footer(props, *body):
     return readit22(
         [v.vblock22, {'xid': 'b1', 'proportion': 0, 'flag': wx.EXPAND, 'min_size': (-1, 53)},
-         [v.block22, {'xid': 'b1', 'dir': wx.HORIZONTAL, 'flag': wx.EXPAND | wx.ALL, 'border': 10,
-                     'background_color': '#f0f0f0'},
-           [v.text22, {'xid': 'spacer', 'value': '',  'proportion': 1, 'flag': wx.EXPAND}],
-           [v.button, {'xid': 'srt', 'label': 'Cancel', 'on_click': props['on_cancel']}],
-           [v.button, {'xid': 'cnl', 'label': 'Start',
-                       'on_click': props['on_start'], 'flag': wx.LEFT, 'border': 10}]]]
+         [v.block22, {'xid': 'b1', 'dir': wx.HORIZONTAL,
+                      'flag': wx.EXPAND | wx.ALL, 'border': 10, 'background_color': '#f0f0f0'},
+          *body]]
+    )
+
+def config_footer(props):
+    return readit22(
+        [footer, {},
+         [v.text22, {'xid': 'spacer', 'value': '', 'proportion': 1, 'flag': wx.EXPAND}],
+         [v.button, {'xid': 'srt', 'label': 'Cancel', 'on_click': props['on_cancel']}],
+         [v.button, {'xid': 'cnl', 'label': 'Start', 'on_click': props['on_start'],
+                     'flag': wx.LEFT, 'border': 10}]]
     )
 
 def runtime_footer(props):
     return readit22(
-        [v.block22, {'xid': 'rft', 'dir': wx.HORIZONTAL},
-         [v.gauge, {'xid': 'gauge', 'pulse': True}],
+        [footer, {},
+         [v.gauge, {'xid': 'gauge', 'pulse': True,  'proportion': 0}],
+         [v.text22, {'xid': 'spacer', 'value': '', 'proportion': 1, 'flag': wx.EXPAND}],
          [v.button, {'xid': 'stopbtn', 'label': 'Stop'}]]
     )
 
@@ -58,18 +72,90 @@ def header(props):
       [v.bitmap, {'xid': 'bmp', 'uri': props['icon_uri'], 'flag': wx.CENTER | wx.RIGHT, 'border': 10}]]
     )
 
+
 def textinput(props):
     return [v.textctrl, {'xid': props['value'], 'value': props['value']}]
 
-def textinput(props):
-    return [v.block22, {'xid': 'chsr', 'dir': wx.HORIZONTAL},
-            [v.textctrl, {'xid': props['value'], 'value': props['value']}],
-            [v.button, {'xid': props['value'], 'value': props['value']}]]
 
+def chooser(props, *body):
+    return [v.block22, {'xid': 'chsr', 'dir': wx.HORIZONTAL, 'flag': wx.EXPAND},
+            [v.textctrl, {'xid': 'chtctrl', 'value': props['value'], 'proportion': 1}],
+            [v.button, {'xid': 'chbtn', 'label': props['label'], 'flag': wx.LEFT, 'border': 5}]]
+
+
+
+def www(props, children):
+    return v.block22(
+        children=[
+            v.text22(value='hey'),
+            v.text22(value='yp'),
+            *children
+        ]
+    )
+
+
+def two_columns(props, *body):
+    """
+    display all children in groups of two widgets
+    """
+    children = list(map(readit22, body))
+    updated_children = []
+    for c1, c2 in chunk(children, 2):
+        c1['attrs'].update({'proportion': 1})
+        if c2:
+            c2['attrs'].update({'proportion': 1, 'flag': wx.LEFT, 'border': 20})
+            updated_children.append(v.block22({'xid': 'g', 'dir': wx.HORIZONTAL, 'flag': wx.EXPAND | wx.TOP, 'border': 20}, c1, c2))
+        else:
+            updated_children.append(v.block22({'xid': 'g', 'dir': wx.HORIZONTAL, 'flag': wx.EXPAND | wx.TOP, 'border': 20}, c1))
+
+    return v.block22({'xid': 'two-col', 'flag': wx.EXPAND | wx.TOP, 'border': 20}, *updated_children)
+
+
+def widget(props, *body):
+    return readit22(
+      [v.block22, {'xid': 'widget', 'flag': wx.TOP | wx.EXPAND, 'border': 20},
+       [v.text22, {'xid': 'a', 'value': props['label'], 'font': bold_font()}],
+       [v.text22, {'xid': 'a', 'value': props['help']}],
+       *body]
+    )
+
+
+
+def when(props, *body):
+    if props['is_true']:
+        return v.block22({'xid': props['xid'],'proportion': 1, 'flag': wx.EXPAND}, *map(readit22, body))
+    else:
+        return v.block22({'xid': 'n', 'proportion': 0})
+
+
+def main_body(props, *body):
+    if props['screen'] == Screens.CONFIG:
+        return config_page(props)
+    else:
+        return readit22([v.textctrl, {'xid': '111', 'value': 'uhh'}])
 
 def config_page(props):
     return readit22(
       [v.scrollblock, {'xid': 'confg', 'proportion': 1, 'flag': wx.EXPAND},
-       *[[v.text22, {'xid': str(e), 'value': 'Hello!'}]
-         for e in range(13)]]
+       [v.block22, {'xid': '12', 'proportion': 1, 'flag': wx.EXPAND | wx.ALL, 'border': 20},
+        # Required args section
+        [v.block22, {'xid': 'reqs', 'flag': wx.EXPAND | wx.BOTTOM, 'border': 30},
+         [v.text22, {'xid': 'a', 'value': 'Required Arguments', 'font': title_font()}],
+         [v.line, {'xid': 'rl', 'flag': wx.EXPAND}],
+         [v.grid, {'xid': 'grid', 'cols': 1, 'gap': (20, 10), 'flag': wx.EXPAND},
+          [widget, {'label': 'Input File', 'help': 'Path to the input video to convert'},
+           [chooser, {'label': 'Browse', 'value': ''}]],
+          [widget, {'label': 'Output Directory', 'help': 'Directory where we\'ll write the output'},
+           [chooser, {'label': 'Browse', 'value': ''}]]]],
+
+        # Optional Args Section
+        [v.block22, {'xid': 'reqs', 'flag': wx.EXPAND | wx.BOTTOM, 'border': 40},
+         [v.text22, {'xid': 'a', 'value': 'Optional Arguments', 'font': title_font()}],
+         [v.line, {'xid': 'rl', 'flag': wx.EXPAND}],
+         [v.grid, {'xid': 'grid', 'cols': 2, 'gap': (20, 10), 'flag': wx.EXPAND},
+          [widget, {'label': 'Frame rate', 'help': 'Target frame rate to use during encoding'},
+           [v.textctrl, {'xid': 1, 'proportion': 0, 'flag': wx.EXPAND}]],
+          [widget, {'label': 'foobar', 'help': 'Foo the barrer?'},
+           [v.textctrl, {'xid': 1, 'proportion': 0, 'flag': wx.EXPAND}]]]]]
+       ]
     )

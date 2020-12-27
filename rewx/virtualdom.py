@@ -9,6 +9,14 @@ def block22(attrs, *body):
         'children': body
     }
 
+def grid(attrs, *body):
+    return {
+        'type': 'grid',
+        'id': 'uuid',
+        'attrs': attrs,
+        'children': body
+    }
+
 
 def line(attrs, *body):
     return {
