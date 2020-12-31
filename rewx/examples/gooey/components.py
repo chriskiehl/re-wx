@@ -43,17 +43,16 @@ def config_footer(props):
 def runtime_footer(props):
     return readit22(
         [footer, {},
-         [v.gauge, {'xid': 'gauge', 'pulse': True,  'proportion': 0}],
-         [v.text22, {'xid': 'spacer', 'value': '', 'proportion': 1, 'flag': wx.EXPAND}],
-         [v.button, {'xid': 'stopbtn', 'label': 'Stop'}]]
+         [v.gauge, {'xid': 'gauge', 'pulse': True,  'proportion': 0}]]
     )
 
-def finished_footer(props):
+def results_footer(props):
     return readit22(
-        [v.block22, {'xid': 'rft', 'dir': wx.HORIZONTAL},
-         [v.button, {'xid': 'edit', 'label': 'Edit'}],
-         [v.button, {'xid': 'rsart', 'label': 'Restart'}],
-         [v.button, {'xid': 'close', 'label': 'Close'}]]
+        [footer, {},
+         [v.text22, {'xid': 'spacer', 'value': '', 'proportion': 1, 'flag': wx.EXPAND}],
+         [v.button, {'xid': 'edit', 'label': 'Edit', 'on_click': props['on_edit']}],
+         [v.button, {'xid': 'rsart', 'label': 'Restart', 'on_click': props['on_restart']}],
+         [v.button, {'xid': 'close', 'label': 'Close', 'on_click': props['on_close']}]]
     )
 
 
@@ -79,7 +78,7 @@ def textinput(props):
 
 def chooser(props, *body):
     return [v.block22, {'xid': 'chsr', 'dir': wx.HORIZONTAL, 'flag': wx.EXPAND},
-            [v.textctrl, {'xid': 'chtctrl', 'value': props['value'], 'proportion': 1}],
+            [v.textctrl, {'xid': props['xid'], 'value': props['value'], 'proportion': 1, 'on_change': props['on_change']}],
             [v.button, {'xid': 'chbtn', 'label': props['label'], 'flag': wx.LEFT, 'border': 5}]]
 
 
@@ -143,19 +142,22 @@ def config_page(props):
          [v.text22, {'xid': 'a', 'value': 'Required Arguments', 'font': title_font()}],
          [v.line, {'xid': 'rl', 'flag': wx.EXPAND}],
          [v.grid, {'xid': 'grid', 'cols': 1, 'gap': (20, 10), 'flag': wx.EXPAND},
-          [widget, {'label': 'Input File', 'help': 'Path to the input video to convert'},
-           [chooser, {'label': 'Browse', 'value': ''}]],
-          [widget, {'label': 'Output Directory', 'help': 'Directory where we\'ll write the output'},
-           [chooser, {'label': 'Browse', 'value': ''}]]]],
+          *[[widget, {'label': opt['label'], 'help': opt['help']},
+             [chooser, {'xid': opt['id'],
+                        'label': 'Browse',
+                        'value': opt['value'],
+                        'on_change': props['on_change']}]]
+            for opt in props['required']]]],
 
         # Optional Args Section
         [v.block22, {'xid': 'reqs', 'flag': wx.EXPAND | wx.BOTTOM, 'border': 40},
          [v.text22, {'xid': 'a', 'value': 'Optional Arguments', 'font': title_font()}],
          [v.line, {'xid': 'rl', 'flag': wx.EXPAND}],
          [v.grid, {'xid': 'grid', 'cols': 2, 'gap': (20, 10), 'flag': wx.EXPAND},
-          [widget, {'label': 'Frame rate', 'help': 'Target frame rate to use during encoding'},
-           [v.textctrl, {'xid': 1, 'proportion': 0, 'flag': wx.EXPAND}]],
-          [widget, {'label': 'foobar', 'help': 'Foo the barrer?'},
-           [v.textctrl, {'xid': 1, 'proportion': 0, 'flag': wx.EXPAND}]]]]]
-       ]
+          *[[widget, {'label': opt['label'], 'help': opt['help']},
+             [v.textctrl, {'xid': opt['id'],
+                           'value': opt['value'],
+                           'flag': wx.EXPAND,
+                           'on_change': props['on_change']}]]
+            for opt in props['optional']]]]]]
     )

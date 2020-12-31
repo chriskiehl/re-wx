@@ -1,4 +1,8 @@
+"""
+https://github.com/MrS0m30n3/youtube-dl-gui
+"""
 from wx.lib.pubsub import pub
+
 import wx
 from functools import partial
 from pyrsistent import m, pmap, freeze, thaw
@@ -12,7 +16,7 @@ import os
 
 import time
 
-from rewx.rewx import Component, readit22
+from rewx.rewx import Component, wsx
 from subimpl import AppDB
 from util import extend, veq
 from virtualdom import block22, textctrl, text22, textarea, button, dropdown, listctrl, bitmap, \
@@ -171,14 +175,14 @@ class YoutubeDownloader(Component):
             else './images/folder_32px.png'
 
     def render(self):
-        return readit22(
-            [block22, {'xid':'main'},
-             [text22, {'xid': '1', 'value': 'Enter URLs below'}],
+        return wsx(
+            ['block', {'xid':'main'},
+             ['statictext', {'xid': '1', 'value': 'Enter URLs below'}],
              [textarea, {'xid': 'urls',
                          'disabled': self.is_downloading(),
                          'value': self.state['urls'],
                          'on_change': self.handle_url_change}],
-             [block22, {'xid': 'opts', 'dir': wx.HORIZONTAL},
+             ['block', {'xid': 'opts', 'dir': wx.HORIZONTAL},
               [bitmap, {'xid': 'diricon', 'uri': 'images/folder_32px.png'}],
               [textctrl, {'placeholder': 'choose output directory',
                           'xid': 'output',
