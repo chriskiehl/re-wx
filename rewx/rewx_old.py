@@ -2,6 +2,25 @@ import threading
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 
+def basic_app(title, root):
+    app = wx.App()
+    # wx.lib.inspection.InspectionTool().Show()
+    frame = wx.Frame(None, title='Test re-wx')
+    frame.SetSize((570, 520))
+    box = wx.BoxSizer(wx.VERTICAL)
+    box.Add(root(frame), 1, wx.EXPAND)
+    frame.SetSizer(box)
+    frame.Show()
+    # frame.Fit()
+
+    for child in frame.GetChildren():
+        for ccc in child.GetChildren():
+            for cc in ccc.GetChildren():
+                cc.Layout()
+            ccc.Layout()
+        child.Layout()
+    app.MainLoop()
+
 
 def readit22(schema):
     if not schema:
@@ -29,6 +48,7 @@ class Component:
     def __init__(self):
         self._instance = None
         self.state = None
+        self.props = {}
 
     def setState(self, nextState):
         #todo: this lock does nothing.. needs to be am update fn fr cas
@@ -41,6 +61,10 @@ class Component:
             # nextPlainData = self.render()
             # self.mount(nextPlainData)
 
+    def setState2(self, fn):
+        with threading.Lock():
+            self.state = fn(self.state)
+            wx.CallAfter(updater, self._instance, self.render())
 
     def render(self):
         pass
@@ -48,17 +72,22 @@ class Component:
     def update(self, elm):
         pass
 
+    def component_did_mount(self):
+        pass
+
     def __call__(self, parent):
         if self._instance is None:
             factory = renderer(self.render())
             instance = factory(parent)
+            self.component_did_mount()
             self._instance = instance
             return instance
         else:
             raise ValueError('I cannot even right now')
 
 
-
+# TODO: componentDidMount
+# TODO: componentDidUpdate
 # TODO: need React.fragment style component!
 
 def updater(prevdom: wx.Window, newdom):
@@ -69,6 +98,8 @@ def updater(prevdom: wx.Window, newdom):
         find where it diverges
         delete and recreate
     """
+    if not any([getattr(x, 'xid', None) for x in prevdom.GetChildren()]):
+        missing_xid = 10
     if prevdom.xid != newdom['attrs']['xid']:
         parent = prevdom.GetParent()
         parent.Freeze()
@@ -205,8 +236,6 @@ def updatelistctrl(instance: wx.ListCtrl, elm):
     for e, col in enumerate(elm['attrs'].get('cols')):
         instance.InsertColumn(e, col['title'])
 
-
-
     for row_idx, item in enumerate(elm['attrs']['data']):
         instance.InsertItem(row_idx, '')
         for col_idx, coldef in enumerate(elm['attrs'].get('cols')):
@@ -267,7 +296,6 @@ def block2wx(spec):
         for elm in spec['children']:
             ee = renderer(elm)
             e = ee(panel)
-
             box.Add(e, elm['attrs'].get('proportion', 0),
                     elm['attrs'].get('flag', 0),
                     elm['attrs'].get('border', 0))
@@ -375,6 +403,9 @@ def textctrl2wx(spec):
         text = wx.TextCtrl(parent)
         if spec['attrs'].get('disabled', False):
             text.Disable()
+        if 'ref' in spec['attrs']:
+            ref = spec['attrs']['ref']
+            ref.update_ref(text)
         text.SetValue(spec['attrs'].get('value', ''))
         text.xid = spec['attrs']['xid']
         text.SetEditable(not spec['attrs'].get('readonly', False))
@@ -394,6 +425,9 @@ def textarea2wx(spec):
         text = wx.TextCtrl(parent, style=wx.TE_MULTILINE)
         text.SetValue(spec['attrs'].get('value'))
         text.xid = spec['attrs']['xid']
+        if 'ref' in spec['attrs']:
+            ref = spec['attrs']['ref']
+            ref.update_ref(text)
         if spec['attrs'].get('disabled', False):
             text.Disable()
         if spec['attrs'].get('on_change'):
@@ -424,6 +458,7 @@ def bitmap2wx(spec):
 
 
 def updategauge(instance: wx.Gauge, elm):
+    instance.xid = elm['attrs']['xid']
     if elm['attrs'].get('range'):
         instance.SetRange(elm['attrs'].get('range'))
     if elm['attrs'].get('value'):

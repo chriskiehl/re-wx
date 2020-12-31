@@ -1,5 +1,10 @@
 # re-wx
-An experiment in bringing React(ish) style development to WXPython
+
+A library for building declarative desktop applications in WX.
+
+
+
+
 
 What if instead of subclassing, we could write declarative, data-driven code? 
 
@@ -40,6 +45,8 @@ def handle_choose_dir(self, event):
 
 Events: re-wx does no event wrapping. The normal WX events are used. 
 
+It's not trying to be an opaque framework hiding away the internal details of WX. It's very much designed to operate on-top of and in concert with WX. 
+
 # compromises
 
 It's not a true one-way data flow for certain components. For instance, in WX, ComboBoxes only produce events _after_ it's internally updated its state. 
@@ -49,6 +56,32 @@ Another example is TextCtrl. EVT_TEXT is fired _after_ the textctrl has been upd
 However, in practice, this tends to not matter much. You can still update the control in rsponse to the event, which generally happens fast enough that the transient state isn't noticed by the user (if shown on the screen at all!)
 
 
+More caveats: 
+
+Only the most common attributes are currently managed by declarative props (basically, most of what falls under `wx.Control`). Specifics such as `InsertionPoint`s in TextCtrls are considered out of scope for rewx. `Ref`s act as a handy escape-hatch for any lower level API needs .
+
+More Caveats: 
+
+The prefab RadioGroup cannot have its number of options changed after creation. So, jiggling the `choices` will have no effect. The good news is that RadioGroup is largely just a convenience class, if you need to dynamically vary the options, you can simulate the RadioGroup via 
+
+TODO
+```python
+class MyRadioGroup(Component): 
+    def render(self):
+        return wsx(
+            ['borderbox', {} ]
+        )
+
+
+``` 
+
+
+
+# Current state of the world: 
+
+Implementation notes: 
+
+The reconciliation step is crazy naive at the moment. It currently searches only to the first node at which point identifiers or child identifiers differ, at which point it blanket destroys and recreats the components from that path of the tree. Eventaully, this will be cleaned up, however, even for fairly large UIs, it hasn't produced notable performance issues.   
  
 
 
