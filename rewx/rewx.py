@@ -112,9 +112,6 @@ def patch(dom: wx.Window, vdom):
         parent.Thaw()
 
 
-
-
-
 class Component:
     def __init__(self, props):
         self.props = props
@@ -159,11 +156,65 @@ class Component:
         patch(self.base, self.render())
 
 
+class Block(wx.Panel):
+    pass
+
+"""
+from rewx import components as c 
+
+[c.block, {},
+  ] 
+
+
+data EntityType 
+  = Primitive String
+  | Composite 
+  | Function 
+
+
+data EntityType 
+  = Primitive wx.Object
+  | Composite 
+  | Function 
+
+
+primitives have mount/patch methods 
+Composites have life cycles + render/patch 
+functions eval to Primitives or Composites
+
+
+mount :: EntityType -> Parent -> wx.Object 
+mount (Primitive x) parent = mount2(x)
+mount (Composite x) parent = mount2(x)
+
+
+def primitive(type): 
+    return Primitive(type)
+
+def render(element, parent):
+    if isprimitive(element['type']): 
+        return mount(element, parent)
+    # isclass
+    elif type(element['type']) == type:
+        return element['type'].Render(element, parent)
+    # is sfc 
+    elif callable(element['type']):
+        # stateless functional component
+        return render(element['type'](element['props']), parent)
+    else:
+        raise Unknown Type 
+"""
+
 def render(element, parent):
     if element['type'] == 'statictext':
         return statictext2wx(element, parent)
+    elif element['type'] == 'textctrl':
+        return textctrl2wx(element, parent)
     elif type(element['type']) == type:
         return element['type'].Render(element, parent)
+    elif callable(element['type']):
+        # stateless functional component
+        return render(element['type'](element['props']), parent)
     else:
         instance: wx.Panel = block2wx(element, parent)
         sizer = instance.GetSizer()

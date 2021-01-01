@@ -2,8 +2,12 @@
 
 A library for building declarative desktop applications in WX.
 
+ * declarative: 
+ * Component based -  
+ * complete interop with the rest of your WX codebase - re-wx doesn't require you to change anything about your current codebase to start using it. Just create a component, attach it to an existing set of WX widgets, and off you go.  
+ 
 
-
+This is an implementation of React's ideas _on top_ of WX. 
 
 
 What if instead of subclassing, we could write declarative, data-driven code? 
@@ -33,7 +37,7 @@ class MyPanel(wx.Panel):
 
 # tradeoffs:
 
-Practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). Here we'd just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, Python can block in place without affecting the main UI thread. Which allows writing 
+Practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. Here we'd just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, Python can block in place without affecting the main UI thread. Which allows writing 
 straight forward in-line Dialog code.  
 
 ```python
@@ -81,7 +85,7 @@ class MyRadioGroup(Component):
 
 Implementation notes: 
 
-The reconciliation step is crazy naive at the moment. It currently searches only to the first node at which point identifiers or child identifiers differ, at which point it blanket destroys and recreats the components from that path of the tree. Eventaully, this will be cleaned up, however, even for fairly large UIs, it hasn't produced notable performance issues.   
+Reconciliation doesn't have many performance focused smarts at this point. It only looks at the current props to decide what to do, and thus blanket unsets/resets values every time, as opposed to a more nuanced approach which diff'd the prev/current props and conditionally updated only those pieces which need changes. However, so far, with moderately sized UIs, this naieve approach hasn't produced any notable performance issues. This may change in the future.  
  
 
 

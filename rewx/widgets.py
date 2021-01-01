@@ -1,6 +1,206 @@
 import wx
-
+import wx.adv
+# TODO: warn on unknown props?
 # on_click event type needs to be overriden per type
+from typing import Union, Optional
+
+
+def noop(instance, props):
+    return instance
+
+
+def dispatch(func):
+    """
+    TODO
+    """
+    registry = {'default': func}
+
+    def register(cls, func=None):
+        """TODO"""
+        assert issubclass(cls, wx.Object), "TODO! Explain why it must be one of these!"
+        if func is None:
+            return lambda f: register(cls, f)
+        registry[cls] = func
+        return func
+
+    def wrapper(element, parent: wx.Window):
+        try:
+            return registry[element['type']](element, parent)
+        except KeyError:
+            return registry['default'](element, parent)
+
+    registry[object] = func
+    wrapper.register = register
+    wrapper.dispatch = dispatch
+    return wrapper
+
+
+
+"""
+basic setters:
+```
+label -> SetLabel
+```
+
+noarg changers:
+```
+instance.Start()
+instance.Stop() 
+
+'start': {
+  'true': instance.Start(),
+  'false': instance.Stop()
+}
+```
+
+
+handlers, which need to know the type of event to bind (which differs based on Instance type): 
+
+on_input -> instance.Bind(wx.EVT_TEXT, handler)
+on_input -> instance.Bind(wx.EVT_CHECKBOX, handler) 
+
+on_click -> instance.Bind(wx.EVT_BUTTON, handler)
+on_click -> instance.Bind(wx.EVT_LEFT_DOWN, handler)
+
+
+'on_click': {
+    'wx.StaticText': wx.EVT_LEFT_DOWN,
+    'wx.Button': wx.EVT_BUTTON,
+    ...  
+},
+'on_change': {
+    'wx.StaticText': N/A,
+    'wx.Button': N/A,
+    'wx.TextCtrl': wx.EVT_TEXT
+}
+
+updater :: Instance -> Props -> Instance 
+
+ 
+
+"""
+
+
+basic_controls = {
+    '*': {
+
+    },
+    'label': 'SetLabel',
+    'value': 'SetValue',
+    'background_color': 'SetBackgroundColor',
+    'foreground_color': 'SetForegroundColour',
+    'font': 'SetFont',
+    'helptext': 'SetHelpText',
+    'name': 'SetName',
+    'minsize': 'SetMinSize',
+    'maxsize': 'SetMaxSize',
+    'tooltip': 'SetToolTip',
+    'show': 'Show',
+    'style': 'SetStyle',
+}
+
+
+def on_change(instance, props):
+    pass
+
+
+def set_basic_props(instance, props):
+    for key, val in props.items():
+        if key.startswith('on_'):
+            continue
+        try:
+            getattr(instance, basic_controls[key])(val)
+        except KeyError:
+            # prop which doesn't apply to this control
+            pass
+    return instance
+
+
+@dispatch
+def update(instance, props):
+    return set_basic_props(instance, props)
+
+
+def activity_indicator(instance: wx.ActivityIndicator, props: dict):
+    set_basic_props(instance, props)
+    if props.get('start'):
+        instance.Stop()
+    else:
+        instance.Stop()
+    return instance
+
+
+def calendarctrl(instance: wx.adv.CalendarCtrl, props) -> wx.Object:
+    set_basic_props(instance, props)
+    additions = {
+        'selected_date': 'SetDate',
+        'display_holidays': 'EnableHolidayDisplay',
+        'allow_month_change': 'EnableMonthChange',
+    }
+    for prop_key, wx_method in additions.items():
+        if prop_key in props:
+            getattr(instance, wx_method)(props[prop_key])
+
+    instance.Unbind(wx.adv.EVT_CALENDAR_SEL_CHANGED)
+    if props.get('on_change'):
+        # TODO: verify callable?
+        instance.Bind(wx.adv.EVT_CALENDAR_SEL_CHANGED, props['on_change'])
+    return instance
+
+
+def checkbox(instance: wx.CheckBox, props):
+    set_basic_props(instance, props)
+    instance.Unbind(wx.EVT_CHECKBOX)
+    if props.get('on_change'):
+        instance.Bind(wx.EVT_CHECKBOX, props['on_change'])
+    return instance
+
+
+def collapsiblepanel(instance: wx.CollapsiblePane, props):
+    set_basic_props(instance, props)
+    instance.Collapse(props.get('collapsed', False))
+    instance.Unbind(wx.EVT_COLLAPSIBLEPANE_CHANGED)
+    if props.get('on_change'):
+        instance.Unbind(wx.EVT_COLLAPSIBLEPANE_CHANGED, props['on_change'])
+    return instance
+
+
+
+def combobox(instance: wx.ComboBox, props) -> wx.Object:
+    set_basic_props(instance, props)
+    instance.Clear()
+    instance.AppendItems(props.get('choices', []))
+    instance.SetValue(props.get('value'))
+    # clean up existing handlers (if any)
+    instance.Unbind(wx.EVT_COMBOBOX)
+    instance.Unbind(wx.EVT_TEXT)
+    # rebind as relevant
+    if props.get('on_change'):
+        instance.Bind(wx.EVT_COMBOBOX, props['on_change'])
+    if props.get('on_input'):
+        instance.Bind(wx.EVT_TEXT, props['on_input'])
+    return instance
+
+
+def gauge(instance: wx.Gauge, props: dict) -> wx.Object:
+    set_basic_props(instance, props)
+    if props.get('range'):
+        instance.SetRange(props['range'])
+    if props.get('pulse', False):
+        instance.Pulse()
+    return instance
+
+
+def listbox(instance: wx.ListCtrl, props):
+    instance.Un
+    return instance
+
+
+
+
+# def checkbox(instance: wx.CheckBox, props: dict):
+
+
 
 mapp = {
     'wx.Window': {
@@ -17,15 +217,15 @@ mapp = {
             'SetToolTip': 'tooltip',
             'Show': 'show',
             'SetStyle': 'style'
-
         },
         'wx.ActivityIndicator': {
-            'Start': 'start: boolean'
+            'start': 'Start'
         },
         'wx.adv.CalendarCtrl': {
-            'SetState': 'initial_date: datetime', # ?
-            'EnableHolidayDisplay': 'holday_display: bool',
-            'EnableMonthChange': 'month_change: bool',
+            'selected_date': 'SetDate', # ?
+            'holiday_display': 'EnableHolidayDisplay',
+            'month_change': 'EnableMonthChange',
+
             'EVT_CALENDAR_SEL_CHANGED': 'on_change: fn',
         },
         'wx.CheckBox': {
@@ -115,7 +315,7 @@ mapp = {
         },
         'wx.BitmapButton': {
             'EVT_BUTTON': 'on_click',
-            ''
+            'SetBitmap': 'uri'
         },
         'wx.ToggleButton': {
             'EVT_TOGGLEBUTTON': 'on_click',
@@ -132,18 +332,130 @@ mapp = {
                 'SetHint',
                 'ChangeValue' # for updates
             },
-        'listctrl': {
-            'api': {'TBD'}
-        }
-
     }
-
 }
+
+class MyThing(wx.Panel):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+
+
+import wx
+
+
+
+"""
+mount :: Type -> Element -> wx.Object 
+
+"""
+
+
+from functools import singledispatch
+
+
+
+
+
+@dispatch
+def mount(element, parent):
+    element['type'](parent)
+    print('handling the default case!', element, parent)
+
+@mount.register(wx.Panel)
+def foo(element, parent):
+    print('handling wx.Panel!')
+
+
+@mount.register(wx.StaticBitmap)
+def foo(element, parent):
+    bitmap = wx.Bitmap(element['props']['uri'])
+    bitmap._uri = element['props']['uri']
+    staticbitmap = wx.StaticBitmap(parent, -1, bitmap)
+    return staticbitmap
+    print('handling wx.Panel!')
+
+
+def update_bitmap(instance: wx.StaticBitmap, props):
+    if props['uri'] != instance.GetBitmap()._uri:
+        bitmap: wx.Bitmap = instance.GetBitmap()
+    return instance
+
+@mount.register(wx.Button)
+def foo(element, parent):
+    print('handling wx.Button!')
+
+mount({'type': wx.TextCtrl}, 'Parent')
+mount({'type': wx.Button}, 'Parent')
+mount({'type': wx.Panel}, 'Parent')
+mount({'type': wx.StaticText}, 'Parent')
+
+
+
+
+
+import sys
+sys.exit(0)
+
+
+
+
+class Managed:
+    def mount(self, element, parent: wx.Window) -> wx.Object:
+        tc = wx.TextCtrl(parent)
+        group = wx.RadioBox(parent, choices=[], style=wx.RB_GROUP)
+        return group
+
+    def patch(self, props, instance: wx.Window) -> wx.Object:
+        pass
+
+
+
+def instantiate_wx(type, element, parent):
+    instance = type(parent)
+    instance._type = element['type']
+    return instance
 
 
 def assign_props(instance: wx.Panel, props):
     instance.SetToolTip()
     pass
+
+primitives = {
+    'statictext': statictext
+}
+
+def statictext(element, parent):
+    return assign_props(instantiate_wx(wx.StaticText, element, parent), element['props'])
+
+
+def statictext2wx(element, parent):
+    text = wx.StaticText(parent)
+    text.SetLabel(element['props'].get('value'))
+    if element['props'].get('on_click'):
+        text.Bind(wx.EVT_LEFT_DOWN, element['props'].get('on_click'))
+    text._type = element['type']
+    return text
+
+def block2wx(element, parent):
+    panel = wx.Panel(parent)
+    panel._type = element['type']
+    box = wx.BoxSizer((element.get('props') or {}).get('orient', wx.VERTICAL))
+    # for elm in element['props']['children']:
+    #     wx_instance = render(elm, panel)
+    #     box.Add(wx_instance, elm['props'].get('proportion', 0),
+    #             elm['props'].get('flag', 0),
+    #             elm['props'].get('border', 0))
+    panel.SetSizer(box)
+    return panel
+
+
+
+
+
+
+
+# OLD BELOW HERE
 
 
 def updatestatictext(instance: wx.StaticText, elm):

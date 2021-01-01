@@ -76,8 +76,10 @@ def patch(dom: wx.Window, vdom):
     parent = dom.GetParent()
     try:
         parent.Freeze()
+        # issubclass(vdom['type'], Component)
         if type(vdom['type']) == type:
             return Component.Patch(dom, vdom)
+        # isstatelessfunctional
         if callable(vdom['type']):
             return patch(dom, vdom['type'](vdom['props']))
         if vdom['type'] != dom._type:
@@ -96,7 +98,6 @@ def patch(dom: wx.Window, vdom):
                 else:
                     parent.RemoveChild(pool[key])
                     render(child, parent)
-
             newdom = dom
         p = parent
         while p:
@@ -245,6 +246,57 @@ class Clock(Component):
                            'border': 60}]]
         )
 
+
+
+class Block(wx.Panel):
+    pass
+
+"""
+from rewx import components as c 
+
+[c.block, {},
+  ] 
+
+
+data EntityType 
+  = Primitive String
+  | Composite 
+  | Function 
+
+
+data EntityType 
+  = Primitive wx.Object
+  | Composite 
+  | Function 
+
+
+primitives have mount/patch methods 
+Composites have life cycles + render/patch 
+functions eval to Primitives or Composites
+
+
+mount :: EntityType -> Parent -> wx.Object 
+mount (Primitive x) parent = mount2(x)
+mount (Composite x) parent = mount2(x)
+
+
+def primitive(type): 
+    return Primitive(type)
+
+def render(element, parent):
+    if isprimitive(element['type']): 
+        return mount(element, parent)
+    # isclass
+    elif type(element['type']) == type:
+        return element['type'].Render(element, parent)
+    # is sfc 
+    elif callable(element['type']):
+        # stateless functional component
+        return render(element['type'](element['props']), parent)
+    else:
+        raise Unknown Type 
+"""
+
 def render(element, parent):
     if element['type'] == 'statictext':
         return statictext2wx(element, parent)
@@ -273,7 +325,6 @@ def andthen(dom, vdom):
     time.sleep(2)
     print('running!')
     wx.CallAfter(patch, dom, vdom)
-
 
 
 if __name__ == '__main__':

@@ -508,6 +508,7 @@ def dropdown2wx(spec):
 
     def inner(parent):
         dropdown = wx.ComboBox(parent, choices=spec['attrs'].get('choices', []))
+        # dropdown.AppendItems()
         dropdown.xid = spec['attrs']['xid']
         if spec['attrs'].get('selected'):
             dropdown.SetValue(spec['attrs'].get('selected'))

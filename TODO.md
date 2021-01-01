@@ -6,6 +6,7 @@
     * document integrating with other Wx components (i.e. using something like FilterableDropdown declaratively)
     * document that it works with exisitng projects. 'Progressive enhancement'
     * document departures from WX's API (for instance, ListCtrl's simplified interface)
+        * document other API helpers, like block, bitmap button, etc.. 
 * Examples: 
     * Youtube-DL 
     * Gooey 
@@ -14,10 +15,7 @@
     * TODO App 
 * tutorials
 * unmounting! 
-* composing stateful components?
-* divs 
-* input 
-* button 
+    * Threads hang around if not given a chance to unmount (which is super not good)
 * program title 
 * program icon? 
 * app size 
