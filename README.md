@@ -2,11 +2,11 @@
   <img src="https://github.com/chriskiehl/re-wx-images/raw/images/logo/rewx.png"> 
 </p>
 
-A library for building declarative desktop applications in WX.
+A library for building modern declarative desktop applications in WX.
 
  * declarative: 
  * Component based -  
- * complete interop with the rest of your WX codebase - re-wx doesn't require you to change anything about your current codebase to start using it. Just create a component, attach it to an existing set of WX widgets, and off you go.  
+ * complete interop with the rest of your WX codebase - re-wx doesn't require you to change anything about your current codebase to start using it. Just create a component, attach it to an existing set of WX widgets, and off you go! 
  
 
 This is an implementation of React's ideas _on top_ of WX. 
