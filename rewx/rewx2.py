@@ -3,6 +3,15 @@ https://medium.com/@sweetpalma/gooact-react-in-160-lines-of-javascript-44e0742ad
 """
 import functools
 import wx
+from inspect import isclass
+
+from dispatch import dispatch, mount, update
+from rewx.widgets import mount as _mount
+from rewx.widgets import update as _update
+from rewx.widgets import Block
+mount.merge_registries(_mount._registry)
+update.merge_registries(_update._registry)
+
 
 
 def wsx(f):
@@ -82,17 +91,19 @@ def updatewx(instance, props):
 def patch(dom: wx.Window, vdom):
     parent = dom.GetParent()
     try:
-        parent.Freeze()
-        if type(vdom['type']) == type:
+        # parent.Freeze()
+        if isclass(vdom['type']) and issubclass(vdom['type'], Component):
             return Component.Patch(dom, vdom)
-        if vdom['type'] != dom._type:
+        # if type(vdom['type']) == type:
+        #     return Component.Patch(dom, vdom)
+        if not isinstance(dom, vdom['type']):
             for child in dom.GetChildren():
                 dom.RemoveChild(child)
                 child.Destroy()
             dom.Destroy()
             newdom = render(vdom, parent)
-        elif vdom['type'] == dom._type:
-            updatewx(dom, vdom['props'])
+        elif isinstance(dom, vdom['type']):
+            update(vdom, dom)
             pool = {f'__index_{index}': child for index, child in enumerate(dom.GetChildren())}
             for index, child in enumerate(vdom['props'].get('children', [])):
                 key = f'__index_{index}'
@@ -101,15 +112,18 @@ def patch(dom: wx.Window, vdom):
                 else:
                     parent.RemoveChild(pool[key])
                     render(child, parent)
-
             newdom = dom
+        else:
+            raise Exception("unexpected case!")
         p = parent
         while p:
             p.Layout()
             p = p.GetParent()
         return newdom
     finally:
-        parent.Thaw()
+        parent.Update()
+        pass
+        # parent.Thaw()
 
 
 class Component:
@@ -156,60 +170,22 @@ class Component:
         patch(self.base, self.render())
 
 
-class Block(wx.Panel):
-    pass
-
-"""
-from rewx import components as c 
-
-[c.block, {},
-  ] 
-
-
-data EntityType 
-  = Primitive String
-  | Composite 
-  | Function 
-
-
-data EntityType 
-  = Primitive wx.Object
-  | Composite 
-  | Function 
-
-
-primitives have mount/patch methods 
-Composites have life cycles + render/patch 
-functions eval to Primitives or Composites
-
-
-mount :: EntityType -> Parent -> wx.Object 
-mount (Primitive x) parent = mount2(x)
-mount (Composite x) parent = mount2(x)
-
-
-def primitive(type): 
-    return Primitive(type)
 
 def render(element, parent):
-    if isprimitive(element['type']): 
-        return mount(element, parent)
-    # isclass
-    elif type(element['type']) == type:
-        return element['type'].Render(element, parent)
-    # is sfc 
-    elif callable(element['type']):
-        # stateless functional component
-        return render(element['type'](element['props']), parent)
-    else:
-        raise Unknown Type 
-"""
-
-def render(element, parent):
-    if element['type'] == 'statictext':
-        return statictext2wx(element, parent)
-    elif element['type'] == 'textctrl':
-        return textctrl2wx(element, parent)
+    if isclass(element['type']) and issubclass(element['type'], wx.Object):
+        instance = mount(element, parent)
+        for child in element['props'].get('children', []):
+            sizer = instance.GetSizer()
+            if not sizer:
+                render(child, instance)
+            else:
+                sizer.Add(
+                    render(child, instance),
+                    child['props'].get('proportion', 0),
+                    child['props'].get('flag', 0),
+                    child['props'].get('border', 0)
+                )
+        return instance
     elif type(element['type']) == type:
         return element['type'].Render(element, parent)
     elif callable(element['type']):
@@ -229,6 +205,8 @@ def render(element, parent):
 
 
 if __name__ == '__main__':
+    statictext = wx.StaticText
+
     foo_elm = create_element('block', {}, children=[
         create_element('statictext', {'value': 'Hey there, world!'}),
         create_element('statictext', {'value': 'Hey there, again!'}),
@@ -248,11 +226,11 @@ if __name__ == '__main__':
         create_element('statictext', {'value': 'One'}),
     ])
 
-    foo_elm3 = create_element(Foo, {'item1': 'HELLOOOOO'})
-    foo_elm4 = create_element(Bar, {})
-
-    foo_elm5 = create_element(Bar, {'item1': 'HELLOOOOO'})
-    foo_elm6 = create_element(Foo, {'item1': 'BYeeeee'})
+    # foo_elm3 = create_element(Foo, {'item1': 'HELLOOOOO'})
+    # foo_elm4 = create_element(Bar, {})
+    #
+    # foo_elm5 = create_element(Bar, {'item1': 'HELLOOOOO'})
+    # foo_elm6 = create_element(Foo, {'item1': 'BYeeeee'})
 
     # basic_app('My Hello App', foo_elm)
     import wx.lib.inspection
@@ -260,7 +238,7 @@ if __name__ == '__main__':
     wx.lib.inspection.InspectionTool().Show()
     frame = wx.Frame(None, title='Test re-wx')
     frame.SetSize((570, 520))
-    thing = render(foo_elm5, frame)
+    thing = render(create_element(statictext, {'label': 'Two'}), frame)
     # thing = patch(thing, foo_elm6)
     # t = Thread(target=andthen, args=(thing, foo_elm6))
     # t.start()

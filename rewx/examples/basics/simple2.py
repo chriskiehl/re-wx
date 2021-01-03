@@ -28,6 +28,8 @@ def textctrl2wx(element, parent):
 
 def statictext2wx(element, parent):
     text = wx.StaticText(parent)
+    if element['props'].get('name'):
+        text.SetName(element['props']['name'])
     text.SetLabel(element['props'].get('value'))
     if element['props'].get('on_click'):
         text.Bind(wx.EVT_LEFT_DOWN, element['props'].get('on_click'))
@@ -241,6 +243,7 @@ class Clock(Component):
           ['block', {},
            ['textctrl', {'label': 'one fasdf'}],
            ['statictext', {'value': self.state['time'].strftime('%I:%M:%S'),
+                           'name': 'ClackFace',
                            'proporton': 1,
                            'flag': wx.CENTER | wx.ALL,
                            'border': 60}]]
@@ -329,7 +332,7 @@ def andthen(dom, vdom):
 
 if __name__ == '__main__':
     foo_elm = create_element('block', {}, children=[
-        create_element('statictext', {'value': 'Hey there, world!'}),
+        create_element('statictext', {'name': 'Hello', 'value': 'Hey there, world!'}),
         create_element('statictext', {'value': 'Hey there, again!'}),
         create_element('block', {'orient': wx.HORIZONTAL}, children=[
             create_element('statictext', {'value': 'One'}),
@@ -362,8 +365,13 @@ if __name__ == '__main__':
     import wx.adv
     import wx.aui
     from datetime import timedelta
-    ai = wx.StatusBar(frame,)
-    ai.SetStatusText('Hello World!')
+    ai =wx.SpinCtrlDouble(frame,)
+    sizer = wx.BoxSizer()
+    ai.SetSizer(sizer)
+    tc = wx.TextCtrl(ai)
+    sizer.Add(tc)
+    print('digits:', ai.GetDigits())
+    # ai.SetStatusText('Hello World!')
 
     thing = render(create_element(Clock, {}), frame)
     # thing = patch(thing, foo_elm6)

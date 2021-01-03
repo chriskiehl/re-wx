@@ -1,0 +1,128 @@
+import wx
+from unittest import TestCase
+
+from rewx.rewx2 import mount, create_element
+from rewx import components
+
+
+def exclude(m, keys):
+    return {k: v for k,v in base_props.items()
+           if k not in keys}
+
+base_props = {
+    'label': 'some label',
+    'value': 'some value',
+    'background_color': '#ff00ff',
+    'foreground_color': '#ff00ff',
+    'font': wx.Font(),
+    'helptext': 'some help text',
+    'name': type.__name__,
+    'minsize': (100, 100),
+    'maxsize': (200, 200),
+    'tooltip': 'Tool tip here!',
+    'enabled': True,
+    'show': True,
+}
+
+valid_props = {
+    wx.ListCtrl: {
+        **exclude(base_props, {'value', 'background_color'}),
+        'column_def': [],
+        'data': []
+    },
+    wx.Panel: {
+        **exclude(base_props, {'value'}),
+    },
+    wx.RadioBox: {
+        **exclude(base_props, {'value'}),
+        'on_change': lambda *args, **kwargs: None,
+        'selected': 1,
+        'choices': ['one', 'two'],
+        'enabled_items': [0, 1]
+    },
+    wx.RadioButton: {
+        **exclude(base_props, {'value'})
+    },
+    wx.Slider: {
+        **base_props,
+        'value': 10,
+        'min': 0,
+        'max': 1000
+    },
+    wx.SpinCtrl: {
+        **base_props,
+        'value': 10,
+        'min': 0,
+        'max': 1000
+    },
+    wx.SpinCtrlDouble: {
+        **base_props,
+        'value': 10,
+        'min': 0,
+        'max': 1000,
+        'increment': 0.01,
+        'digits': 5
+    },
+    wx.StaticBox: {
+        **exclude(base_props, {'value'})
+    },
+    wx.StaticLine: {
+        **exclude(base_props, {'value'})
+    },
+    wx.StaticText: {
+        **exclude(base_props, {'value'})
+    },
+    components.Grid: {
+        **exclude(base_props, {'value'})
+    },
+    components.Block: {
+        **exclude(base_props, {'value'})
+    }
+}
+
+
+
+class TestWidgets(TestCase):
+
+    def get_defined_components(self):
+        return [
+            obj for name, obj in components.__dict__.items()
+            if name[0].isupper()]
+
+    def empty_element(self, type):
+        return create_element(type, {})
+
+    def populated_element(self, type):
+        return create_element(type, valid_props.get(type, base_props))
+
+    def test_empty_mounting(self):
+        """
+        Testing that all supported WX Primitives can
+        be mounted without additional supporting props (excluding
+        the RadioBox case).
+        """
+        app = wx.App()
+        parent = wx.Frame(None)
+        for element in map(self.empty_element, self.get_defined_components()):
+            with self.subTest(element):
+                # RadioBox doesn't allow constructions without `choices`
+                # being present
+                if element['type'] == wx.RadioBox:
+                    element['props']['choices'] = ['a', 'b', 'c']
+                instance = mount(element, parent)
+                self.assertIsNotNone(instance)
+                self.assertIsInstance(instance, element['type'])
+
+
+    def test_basic_props(self):
+        app = wx.App()
+        parent = wx.Frame(None)
+        for element in map(self.populated_element, self.get_defined_components()):
+            with self.subTest(element):
+                # RadioBox doesn't allow constructions without `choices`
+                # being present
+                if element['type'] == wx.RadioBox:
+                    element['props']['choices'] = ['a', 'b', 'c']
+                instance = mount(element, parent)
+                self.assertIsNotNone(instance)
+                self.assertIsInstance(instance, element['type'])

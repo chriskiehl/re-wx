@@ -16,11 +16,9 @@ import os
 
 import time
 
-from rewx.rewx import Component, wsx
-from subimpl import AppDB
+from rewx.rewx2 import Component, wsx, create_element, render
+from rewx import components as c
 from util import extend, veq
-from virtualdom import block22, textctrl, text22, textarea, button, dropdown, listctrl, bitmap, \
-    bitmapbtn
 
 
 
@@ -69,8 +67,8 @@ def fake_download(item):
 
 
 class YoutubeDownloader(Component):
-    def __init__(self):
-        super(YoutubeDownloader, self).__init__()
+    def __init__(self, props):
+        super().__init__(props)
         self.state = freeze({
             'urls': 'asdf\nqwer',
             'formats': ['mp4', 'mp3', 'm4a', 'vorbis'],
@@ -89,14 +87,15 @@ class YoutubeDownloader(Component):
 
     def update_downloads(self, item):
         print('update_downloads', self.state.status)
-        self.setState(self.state.transform(['downloads', veq('id', item['id'])], item))
+        self.set_state(self.state.transform(['downloads', veq('id', item['id'])], item))
 
     def finish_downloads(self, **kwargs):
-        self.setState(self.state.set('status', 'READY'))
+        self.set_state(self.state.set('status', 'READY'))
 
     def handle_choose_fmt(self, event: wx.CommandEvent):
         # relevant event props: Selection, String
-        self.setState(self.state.set('selected_format', event.String))
+        print('handle_choose_fmt called', event)
+        self.set_state(self.state.set('selected_format', event.String))
 
     def handle_add(self, event: wx.CommandEvent):
         if not self.state.urls:
@@ -104,7 +103,7 @@ class YoutubeDownloader(Component):
         if not os.path.exists(self.state.output_dir):
             return wx.MessageBox("Choose a valid output dir!", caption='Hey!')
         downloads = list(map(self.dload, self.state.urls.split('\n')))
-        self.setState(
+        self.set_state(
             self.state
                 .transform(['downloads'], extend(downloads))
                 .set('urls', ''))
@@ -123,15 +122,15 @@ class YoutubeDownloader(Component):
 
     def handle_url_change(self, event):
         print(event.String)
-        self.setState(self.state.set('urls', event.String))
+        self.set_state(self.state.set('urls', event.String))
 
     def handle_choose_dir(self, event):
         dlg = wx.DirDialog(None, message='Hello?')
         if dlg.ShowModal() == wx.ID_OK:
-            self.setState(self.state.set('output_dir', dlg.GetPath()))
+            self.set_state(self.state.set('output_dir', dlg.GetPath()))
 
     def handle_start(self, event: wx.CommandEvent):
-        self.setState(self.state.set('status', 'DOWNLOADING'))
+        self.set_state(self.state.set('status', 'DOWNLOADING'))
         t = Thread(target=self.run_downloads)
         t.start()
 
@@ -174,43 +173,64 @@ class YoutubeDownloader(Component):
             if self.state.status == 'READY' \
             else './images/folder_32px.png'
 
+
+    def foo(self, event):
+        self.set_state(self.state)
+
     def render(self):
         return wsx(
-            ['block', {'xid':'main'},
-             ['statictext', {'xid': '1', 'value': 'Enter URLs below'}],
-             [textarea, {'xid': 'urls',
-                         'disabled': self.is_downloading(),
-                         'value': self.state['urls'],
-                         'on_change': self.handle_url_change}],
-             ['block', {'xid': 'opts', 'dir': wx.HORIZONTAL},
-              [bitmap, {'xid': 'diricon', 'uri': 'images/folder_32px.png'}],
-              [textctrl, {'placeholder': 'choose output directory',
-                          'xid': 'output',
-                          'disabled': self.is_downloading(),
-                          'value': self.state.output_dir}],
-              [button, {'xid': 'btn',
-                        'disabled': self.is_downloading(),
-                        'label': 'browse',
-                        'on_click': self.handle_choose_dir}],
-              [dropdown, {'xid': 'fmt',
+            [c.Dropdown, {'xid': 'fmt',
                           'on_change': self.handle_choose_fmt,
+                          'on_input': self.foo,
                           'choices': self.state.formats,
-                          'selected': self.state.selected_format}],
-              [button, {'xid': 'add', 'label': 'Add', 'on_click': self.handle_add}]],
-             [block22, {'xid': 'dlist'},
-              [text22, {'xid':'123', 'value': 'Download list'}],
-              [listctrl, {'xid': 'dlds', 'cols': self.column_defs(), 'data': self.state.downloads}]],
-             [bitmapbtn, {'xid': 'start',
-                          'uri': self.run_icon(),
-                          'on_click': self.handle_start}]]
+                          'value': self.state.selected_format}]
+        )
+        return wsx(
+            [c.Block, {},
+             [c.Block, {'flag': wx.EXPAND | wx.ALL, 'border': 20},
+              [c.StaticText, {'label': 'Enter URLs below'}],
+              [c.TextArea, {'disabled': self.is_downloading(),
+                            'value': self.state['urls'],
+                            'flag': wx.EXPAND,
+                            'on_change': self.handle_url_change}],
+              [c.Block,
+               {'orient': wx.HORIZONTAL, 'proportion': 0, 'flag': wx.EXPAND | wx.TOP | wx.BOTTOM,
+                'border': 20},
+               [c.StaticBitmap, {'uri': 'images/folder_32px.png'}],
+               [c.TextCtrl, {'placeholder': 'choose output directory',
+                             'disabled': self.is_downloading(),
+                             'value': self.state.output_dir}],
+               [c.Button, {'disabled': self.is_downloading(),
+                           'label': 'browse',
+                           'on_click': self.handle_choose_dir}],
+               [c.Panel, {'proportion': 1}],
+               [c.Dropdown, {'xid': 'fmt',
+                             'on_change': self.handle_choose_fmt,
+                             'choices': self.state.formats,
+                             'value': self.state.selected_format}],
+               [c.Button, {'xid': 'add', 'label': 'Add', 'on_click': self.handle_add}]],
+              [c.Block, {'xid': 'dlist'},
+               [c.StaticText, {'xid': '123', 'label': 'Download list'}],
+               [c.ListCtrl,
+                {'style': wx.LC_REPORT, 'column_defs': self.column_defs(),
+                 'data': self.state.downloads}]],
+              [c.Block, {'orient': wx.HORIZONTAL, 'flag': wx.EXPAND},
+               [c.Panel, {'proportion': 1}],
+               [c.BitmapButton, {'xid': 'start',
+                                 'uri': self.run_icon(),
+                                 'on_click': self.handle_start}]]]]
         )
 
 
 def app(title, root):
+    import wx
     app = wx.App()
     frame = wx.Frame(None, title='Test re-wx')
+    import wx.lib.inspection
+    wx.lib.inspection.InspectionTool().Show()
+    thing = render(create_element(YoutubeDownloader, {}), frame)
     box = wx.BoxSizer(wx.VERTICAL)
-    box.Add(root(frame))
+    box.Add(thing, 1, wx.EXPAND)
     frame.SetSizer(box)
     frame.Show()
     frame.Fit()
@@ -225,8 +245,7 @@ def app(title, root):
 
 
 def main():
-    homescreen = YoutubeDownloader()
-    app('Youtube-DL', homescreen)
+    app('Youtube-DL', None)
 
 if __name__ == '__main__':
     main()
