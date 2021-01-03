@@ -1,5 +1,3 @@
-# re-wx
-
 <p align="center">
   <img src="https://github.com/chriskiehl/re-wx-images/raw/images/logo/rewx.png"> 
 </p>
