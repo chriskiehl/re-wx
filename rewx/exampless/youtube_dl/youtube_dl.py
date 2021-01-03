@@ -16,14 +16,15 @@ import os
 
 import time
 
-from rewx.rewx2 import Component, wsx, create_element, render
+from app import basicapp
+from rewx.rewx2 import Component, wsx, create_element, render, Ref
 from rewx import components as c
 from util import extend, veq
 
 
 
 def fake_download(item):
-    duration = randint(5,10)
+    duration = randint(3,7)
     size_in_mb = randint(10, 100)
     speed = size_in_mb / float(duration)
     ext = choice(['.webm', '.mp4', '.m4a', '.h264'])
@@ -70,16 +71,12 @@ class YoutubeDownloader(Component):
     def __init__(self, props):
         super().__init__(props)
         self.state = freeze({
-            'urls': 'asdf\nqwer',
+            'urls': '',
             'formats': ['mp4', 'mp3', 'm4a', 'vorbis'],
             'selected_format': 'mp3',
-            'output_dir': r'C:\Users\Chris\Desktop\akira-bk',
+            'output_dir': r'C:\Users\Chris\Desktop',
             'status': 'READY',
             'downloads': [
-                self.dload('youtube,com'),
-                self.dload('google,com'),
-                self.dload('bing,com'),
-
             ]
         })
         pub.subscribe(self.update_downloads, 'download_update')
@@ -91,6 +88,7 @@ class YoutubeDownloader(Component):
 
     def finish_downloads(self, **kwargs):
         self.set_state(self.state.set('status', 'READY'))
+        wx.MessageBox("All downloads completed successfully!", caption='Success!')
 
     def handle_choose_fmt(self, event: wx.CommandEvent):
         # relevant event props: Selection, String
@@ -171,48 +169,75 @@ class YoutubeDownloader(Component):
     def run_icon(self):
         return './images/cloud_download_32px.png' \
             if self.state.status == 'READY' \
-            else './images/folder_32px.png'
+            else './images/stop_32px.png'
 
 
     def foo(self, event):
+        print('foo called')
         self.set_state(self.state)
 
     def render(self):
-        return wsx(
-            [c.Dropdown, {'xid': 'fmt',
-                          'on_change': self.handle_choose_fmt,
-                          'on_input': self.foo,
-                          'choices': self.state.formats,
-                          'value': self.state.selected_format}]
-        )
+        # return wsx(
+        #     [c.Dropdown, {'xid': 'fmt',
+        #                   'on_change': self.handle_choose_fmt,
+        #                   'on_input': self.foo,
+        #                   'choices': self.state.formats,
+        #                   'value': self.state.selected_format}]
+        # )
+        # return wsx(
+        #     [c.TextArea, {'disabled': self.is_downloading(),
+        #                   'value': self.state['urls'],
+        #                   'min_size': (-1, 100),
+        #                   'flag': wx.EXPAND,
+        #                   'on_change': self.handle_url_change}]
+        # )
+        # return wsx(
+        #     [align_center, {},
+        #      [c.Block,
+        #       {'orient': wx.HORIZONTAL, 'proportion': 0, 'flag': wx.EXPAND | wx.TOP | wx.BOTTOM,
+        #        'border': 20},
+        #       [c.StaticBitmap, {'uri': 'images/folder_32px.png'}],
+        #       [c.StaticBitmap, {'uri': 'images/folder_32px.png'}]]]
+        # )
         return wsx(
             [c.Block, {},
              [c.Block, {'flag': wx.EXPAND | wx.ALL, 'border': 20},
               [c.StaticText, {'label': 'Enter URLs below'}],
               [c.TextArea, {'disabled': self.is_downloading(),
                             'value': self.state['urls'],
+                            'min_size': (-1, 100),
                             'flag': wx.EXPAND,
                             'on_change': self.handle_url_change}],
-              [c.Block,
-               {'orient': wx.HORIZONTAL, 'proportion': 0, 'flag': wx.EXPAND | wx.TOP | wx.BOTTOM,
-                'border': 20},
-               [c.StaticBitmap, {'uri': 'images/folder_32px.png'}],
-               [c.TextCtrl, {'placeholder': 'choose output directory',
-                             'disabled': self.is_downloading(),
-                             'value': self.state.output_dir}],
-               [c.Button, {'disabled': self.is_downloading(),
-                           'label': 'browse',
-                           'on_click': self.handle_choose_dir}],
-               [c.Panel, {'proportion': 1}],
-               [c.Dropdown, {'xid': 'fmt',
-                             'on_change': self.handle_choose_fmt,
-                             'choices': self.state.formats,
-                             'value': self.state.selected_format}],
-               [c.Button, {'xid': 'add', 'label': 'Add', 'on_click': self.handle_add}]],
-              [c.Block, {'xid': 'dlist'},
+              [align_center, {'proportion': 0, 'flag': wx.EXPAND},
+               [c.Block,
+                {'orient': wx.HORIZONTAL, 'proportion': 0, 'flag': wx.EXPAND | wx.TOP | wx.BOTTOM,
+                 'border': 20},
+                [c.StaticBitmap, {'uri': 'images/folder_32px.png'}],
+                [c.TextCtrl, {'placeholder': 'choose output directory',
+                              'min_size': (200, -1),
+                              'flag': wx.ALIGN_CENTER_VERTICAL,
+                              'disabled': self.is_downloading(),
+                              'value': self.state.output_dir}],
+                [c.Button, {'disabled': self.is_downloading(),
+                            'label': 'browse',
+                            'flag': wx.ALIGN_CENTER_VERTICAL,
+                            'on_click': self.handle_choose_dir}],
+                [c.Panel, {'proportion': 1}],
+                [c.Dropdown, {'xid': 'fmt',
+                              'on_change': self.handle_choose_fmt,
+                              'flag': wx.ALIGN_CENTER_VERTICAL,
+                              'min_size': (80, -1),
+                              'choices': self.state.formats,
+                              'value': self.state.selected_format}],
+                [c.Button, {'label': 'Add',
+                            'flag': wx.ALIGN_CENTER_VERTICAL,
+                            'on_click': self.handle_add}]]],
+              [c.Block, {'flag': wx.EXPAND},
                [c.StaticText, {'xid': '123', 'label': 'Download list'}],
                [c.ListCtrl,
-                {'style': wx.LC_REPORT, 'column_defs': self.column_defs(),
+                {'style': wx.LC_REPORT,
+                 'flag': wx.EXPAND,
+                 'column_defs': self.column_defs(),
                  'data': self.state.downloads}]],
               [c.Block, {'orient': wx.HORIZONTAL, 'flag': wx.EXPAND},
                [c.Panel, {'proportion': 1}],
@@ -222,30 +247,13 @@ class YoutubeDownloader(Component):
         )
 
 
-def app(title, root):
-    import wx
-    app = wx.App()
-    frame = wx.Frame(None, title='Test re-wx')
-    import wx.lib.inspection
-    wx.lib.inspection.InspectionTool().Show()
-    thing = render(create_element(YoutubeDownloader, {}), frame)
-    box = wx.BoxSizer(wx.VERTICAL)
-    box.Add(thing, 1, wx.EXPAND)
-    frame.SetSizer(box)
-    frame.Show()
-    frame.Fit()
+def align_center(props):
+    return create_element(c.Block, {**props, 'orient': wx.VERTICAL, 'name': 'CENTER'}, children=[
+        create_element(c.Panel, {'proportion': 1, 'flag': wx.EXPAND}),
+        *props['children'],
+        create_element(c.Panel, {'proportion': 1, 'flag': wx.EXPAND}),
+    ])
 
-    for child in frame.GetChildren():
-        for ccc in child.GetChildren():
-            for cc in ccc.GetChildren():
-                cc.Layout()
-            ccc.Layout()
-        child.Layout()
-    app.MainLoop()
-
-
-def main():
-    app('Youtube-DL', None)
 
 if __name__ == '__main__':
-    main()
+    basicapp(create_element(YoutubeDownloader, {}), title='Youtube-DL clone')
