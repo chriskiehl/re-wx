@@ -36,12 +36,7 @@ def readit22(schema):
         attr, *body = args
         return fn(attr, *map(readit22, body))
 
-class Ref:
-    def __init__(self):
-        self.instance = None
 
-    def update_ref(self, instance):
-        self.instance = instance
 
 
 class Component:

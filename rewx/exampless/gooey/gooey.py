@@ -14,7 +14,7 @@ from pyrsistent import pmap, freeze, thaw
 from rewx.rewx import Ref
 from rewx.rewx import Component, readit22
 from wx.lib.pubsub import pub
-from rewx.examples.gooey import components as c
+from rewx.exampless.gooey import components as c
 from util import veq
 
 PROGRESS_CHAN = 'PROGRESS_MESSAGES'

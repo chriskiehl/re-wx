@@ -1,3 +1,7 @@
+"""
+All components and wrappers currently
+supported by rewx.
+"""
 import wx
 import wx.adv
 

@@ -1,6 +1,6 @@
 import wx
 import rewx.virtualdom as v
-from examples.gooey.gooey import Screens
+from exampless.gooey.gooey import Screens
 from rewx.rewx import readit22
 from itertools import zip_longest
 

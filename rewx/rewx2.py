@@ -5,10 +5,10 @@ import functools
 import wx
 from inspect import isclass
 
-from dispatch import dispatch, mount, update
+from rewx.dispatch import mount, update
 from rewx.widgets import mount as _mount
 from rewx.widgets import update as _update
-from rewx.widgets import Block
+
 mount.merge_registries(_mount._registry)
 update.merge_registries(_update._registry)
 
@@ -42,33 +42,6 @@ def create_element(type, props, children=None):
 
 
 
-def foo():
-    wsx(
-      ['block', {},
-       ['statictext', {}]]
-    )
-
-def statictext2wx(element, parent):
-    text = wx.StaticText(parent)
-    text.SetLabel(element['props'].get('value'))
-    if element['props'].get('on_click'):
-        text.Bind(wx.EVT_LEFT_DOWN, element['props'].get('on_click'))
-    text._type = element['type']
-    return text
-
-def block2wx(element, parent):
-    panel = wx.Panel(parent)
-    panel._type = element['type']
-    box = wx.BoxSizer((element.get('props') or {}).get('orient', wx.VERTICAL))
-    # for elm in element['props']['children']:
-    #     wx_instance = render(elm, panel)
-    #     box.Add(wx_instance, elm['props'].get('proportion', 0),
-    #             elm['props'].get('flag', 0),
-    #             elm['props'].get('border', 0))
-    panel.SetSizer(box)
-    return panel
-
-
 def updatewx(instance, props):
     if isinstance(instance, wx.StaticText):
         instance: wx.StaticText = instance
@@ -91,12 +64,17 @@ def updatewx(instance, props):
 def patch(dom: wx.Window, vdom):
     parent = dom.GetParent()
     try:
-        # parent.Freeze()
+        parent.Freeze()
+        if not isclass(vdom['type']):
+            # because stateless functions are just opaque wrappers
+            # they have no relevant diffing logic -- there is no
+            # associated top-level WX element produced from a SFC, only
+            # their inner contents matter. As such, we evaluate it and
+            # push the result back into `patch`
+            return patch(dom, vdom['type'](vdom['props']))
         if isclass(vdom['type']) and issubclass(vdom['type'], Component):
-            return Component.Patch(dom, vdom)
-        # if type(vdom['type']) == type:
-        #     return Component.Patch(dom, vdom)
-        if not isinstance(dom, vdom['type']):
+            return Component.patch_component(dom, vdom)
+        elif not isinstance(dom, vdom['type']):
             for child in dom.GetChildren():
                 dom.RemoveChild(child)
                 child.Destroy()
@@ -121,9 +99,7 @@ def patch(dom: wx.Window, vdom):
             p = p.GetParent()
         return newdom
     finally:
-        parent.Update()
-        pass
-        # parent.Thaw()
+        parent.Thaw()
 
 
 class Component:
@@ -134,7 +110,7 @@ class Component:
         self.base = None
 
     @classmethod
-    def Render(cls, vdom, parent=None):
+    def render_component(cls, vdom, parent=None):
         if cls.__name__ == vdom['type'].__name__:
             instance = vdom['type'](vdom['props'])
             instance.base = render(instance.render(), parent)
@@ -147,13 +123,13 @@ class Component:
             return render(vdom['type'](vdom['props']), parent)
 
     @classmethod
-    def Patch(cls, dom, vdom):
+    def patch_component(cls, dom, vdom):
         parent = dom.GetParent()
         # TODO: is any of this right..?
         if hasattr(dom, '_instance') and type(dom._instance).__name__ == vdom['type'].__name__:
             return patch(dom, dom._instance.render())
         if cls.__name__ == vdom['type'].__name__:
-            return cls.Render(vdom, parent)
+            return cls.render_component(vdom, parent)
         else:
             return patch(dom, vdom['type'](vdom['props']))
 
@@ -174,6 +150,8 @@ class Component:
 def render(element, parent):
     if isclass(element['type']) and issubclass(element['type'], wx.Object):
         instance = mount(element, parent)
+        if element['props'].get('ref'):
+            element['props'].get('ref').update_ref(instance)
         for child in element['props'].get('children', []):
             sizer = instance.GetSizer()
             if not sizer:
@@ -187,21 +165,23 @@ def render(element, parent):
                 )
         return instance
     elif type(element['type']) == type:
-        return element['type'].Render(element, parent)
+        return element['type'].render_component(element, parent)
     elif callable(element['type']):
         # stateless functional component
         return render(element['type'](element['props']), parent)
     else:
-        instance: wx.Panel = block2wx(element, parent)
-        sizer = instance.GetSizer()
-        for child in element['props'].get('children'):
-            sizer.Add(
-                render(child, instance),
-                child['props'].get('proportion', 0),
-                child['props'].get('flag', 0),
-                child['props'].get('border', 0)
-            )
-        return instance
+        # TODO: rest of this message
+        raise TypeError(f'''
+            An unknown type ("{element['type']}") was supplied as a renderable 
+            element. 
+        ''')
+
+class Ref:
+    def __init__(self):
+        self.instance = None
+
+    def update_ref(self, instance):
+        self.instance = instance
 
 
 if __name__ == '__main__':

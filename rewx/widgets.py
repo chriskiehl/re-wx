@@ -4,6 +4,7 @@ import wx.adv
 from rewx.dispatch import mount, update
 
 from rewx.components import Block, Grid, TextArea
+from rewx.util import exclude
 
 
 def noop(*args, **kwargs):
@@ -20,8 +21,8 @@ basic_controls = {
     'font': 'SetFont',
     'helptext': 'SetHelpText',
     'name': 'SetName',
-    'minsize': 'SetMinSize',
-    'maxsize': 'SetMaxSize',
+    'min_size': 'SetMinSize',
+    'max_size': 'SetMaxSize',
     'tooltip': 'SetToolTip',
     'show': 'Show',
     'enabled': 'Enable',
@@ -171,28 +172,28 @@ def combobox(element, parent):
 
 @update.register(wx.ComboBox)
 def combobox(element, instance: wx.ComboBox) -> wx.Object:
-    props = element['props']
+    props = exclude(element['props'], {'value'})
+    # ComboBox is a textctrl and listbox linked together.
+    # Updating one causes events to fire for the other, so
+    # to avoid doubling up the events, we unhook everything,
+    # perform the updates, and then re-add the handlers.
     instance.Unbind(wx.EVT_COMBOBOX)
     instance.Unbind(wx.EVT_TEXT)
-    # rebind as relevant
+
+    set_basic_props(instance, props)
+    # we blanket delete/recreate the items for now, which
+    # seems to be Good Enough. Child diffing could be benchmarked
+    # to see if it's worth the effort.
+    for _ in instance.GetItems():
+        instance.Delete(0)
+    instance.AppendItems(props['choices'])
+    instance.SetSelection(props['choices'].index(element['props'].get('value')))
+
     if props.get('on_change'):
         instance.Bind(wx.EVT_COMBOBOX, props['on_change'])
     if props.get('on_input'):
         instance.Bind(wx.EVT_TEXT, props['on_input'])
 
-    # set_basic_props(instance, props)
-    for _ in instance.GetItems():
-        instance.Delete(0)
-    instance.AppendItems(props['choices'])
-    instance.SetSelection(props['choices'].index(props['value']))
-    print('will set value to:', props.get('value'))
-    # if props.get('value') and instance.GetValue() != props['value']:
-    # instance.ChangeValue(props.get('value', ''))
-    # clean up existing handlers (if any)
-
-    # instance.Show(False)
-    # instance.SetValue(props.get('value', ''))
-    # instance.Show(True)
     return instance
 
 
