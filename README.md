@@ -27,15 +27,28 @@ Rationale:
 
 Development in WX blows.Wrappers around C++ classes. Evertything requires subclassing a low-level plumbing code 
 
+<h2 align="center">See it in action!</h2>
+
+<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
+
+**Starting Small.** You can assemble applications with re-wx using the humble function. This takes data and returns data. re-wx handles all the lifting required to build the WX instances. 
 
 ```python
-class MyPanel(wx.Panel): 
-    def __init__(self, parent, *args, **kwargs):
-        super(MyPanel, self).__init__(parent, *args, **kwargs)
-        self.sizers = ... 
-        self.widgets = ... 
-        self.foo == ... 
+from app import basicapp
+from rewx import create_element
+from rewx.components import StaticText
+
+def say_hello(props):
+    return create_element(StaticText, {'label': f'Howdy, {props["name"]}!'})
+
+if __name__ == '__main__':
+    element = create_element(say_hello, {'name': 'cool person'})
+    basicapp(element, title='My Cool Application!', debug=True)
 ```  
+
+
+
+
 
 # tradeoffs:
 
