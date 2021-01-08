@@ -4,30 +4,37 @@
 
 A library for building modern declarative desktop applications in WX.
 
- * declarative: 
+ * Declarative: 
  * Component based -  
  * complete interop with the rest of your WX codebase - re-wx doesn't require you to change anything about your current codebase to start using it. Just create a component, attach it to an existing set of WX widgets, and off you go! 
  
+re-wx is an implementation of React's ideas _on top_ of WX. re-wx lets you leverage WX native widgets while building using modern dev practices.   
 
-This is an implementation of React's ideas _on top_ of WX. 
 
 
-What if instead of subclassing, we could write declarative, data-driven code? 
+
 
 ```python
-def application(): 
-    return \ 
-      [block, 
-        [input1, {'on_input': handle_input, 'placeholder': 'Enter something!'}],
-        [button, {'on_click': handler}]]
+
+def footer(props): 
+    return wsx(
+        [Block, {'orient': wx.HORIZONTAL}, 
+          [Button, {'on_click': props['on_start'], 'label': 'Ok'}],
+          [Button, {'on_click': props['on_cancel'], 'label': 'Cancel'}]]
+    )
 ```
 
+WX Widgets currently managed by re-wx. 
+
+
+
+Head on over to the Getting Started guide to find out more. 
 
 Rationale: 
 
 Development in WX blows.Wrappers around C++ classes. Evertything requires subclassing a low-level plumbing code 
 
-<h2 align="center">See it in action!</h2>
+<h2 align="center">Quick Demos!</h2>
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
 
@@ -47,8 +54,43 @@ if __name__ == '__main__':
 ```  
 
 
+### A Stateful component 
 
+<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
 
+```python
+class Clock(Component):
+    def __init__(self, props):
+        super().__init__(props)
+        self.timer = None
+        self.state = {
+            'time': datetime.datetime.now()
+        }
+
+    def component_did_mount(self):
+        self.timer = wx.Timer()
+        self.timer.Notify = self.update_clock
+        self.timer.Start(milliseconds=1000)
+
+    def update_clock(self):
+        """
+        We use self.set_state to modify the internal state of the component.
+        A render will happen when state or props change, causing the UI to update.
+        """
+        self.set_state({'time': datetime.datetime.now()})
+
+    def render(self):
+        return wsx(
+          [c.Block, {},
+           [c.StaticText, {'label': self.state['time'].strftime('%I:%M:%S'),
+                           'name': 'ClockFace',
+                           'foreground_color': '#51acebff',
+                           'font': big_ol_font(),
+                           'proporton': 1,
+                           'flag': wx.CENTER | wx.ALL,
+                           'border': 60}]]
+        )
+```
 
 # tradeoffs:
 
