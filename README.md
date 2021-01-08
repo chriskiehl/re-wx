@@ -11,7 +11,27 @@ A Python library for building modern declarative desktop applications in WX
 
 # Overview
 
-re-wx is a library for building modern declarative desktop applications. It's built on top of WXPython, so you get an extremely performant, cross platform applications using _natively rendered_ widgets out of the box. re-wx takes the ideas from React and applies them to WX. With re-wx, you can express what you want your program to do, and it'll do all the heavy lifting of getting WX's widgets to comply. 
+re-wx is a library for building modern declarative desktop applications. It's built on top of WXPython, so you get performant, cross platform, and natively rendered applications right out of the box. It's inspired by React and brings ideals like the virtualdom, Components, and declarative programming to the world of WX. 
+
+
+
+
+## Why WX?
+
+re-wx is focused on building _native_ applications. WX uses the actual APIs of the host system to render real widgets, thus matching the look and feel of the OS on which its running. This also means that WX is _fast_. It's not emulating 
+
+It's built on top of WXPython, so you get an extremely performant, cross platform applications using _natively rendered_ widgets right out of the box. 
+
+**Declarative:** You tell re-wx what you want your program to do, and it'll go do all the heavy lifting to get WX to comply. 
+
+**Expressive:** Say goodbye to trying to express UI layouts with the low level `A.addChild(B)` style plumbing code of WXPython.  
+
+
+### Why not Electron? 
+
+With re-wx, you can build performant, 
+
+
 
 
 ### Flexible
@@ -57,11 +77,11 @@ Decouple yourself from the low-level details.
 
 **Say goodbye to** 
 
-* Thinly wrapped python skins on old bloated C++ classes 
+* Auto-generated thin Python wrappers on old bloated C++ classes 
 * Deep coupling of business logic to stateful widgets
 * Trying to express UIs through low level `A.addChild(B)` plumbing code 
 
-**re-wx** is declarative. You tell re-wx what you want your program to do, and it'll go do all the heavy lifting to get WX to comply. re-wx let's you directly express the relationships between components. 
+
 
 ```python
 class FormControls(wx.Panel): 
@@ -288,3 +308,12 @@ Use `callwith`
 
 ```
 
+## Stuck? Need some help? Just have a question? 
+
+Open an issue [here]()
+Or feel free to hit me up at me@chriskiehl.com
+
+
+## Contributing
+
+All contributions are welcome!
