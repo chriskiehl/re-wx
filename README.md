@@ -18,6 +18,7 @@ class FormControls(wx.Panel):
        super().__init__(*args, **kwargs)
        self.text_entry = wx.TextCtrl(self)
        self.button = wx.Button(self, label='Ok')
+       self.button.Bind(wx.EVT_BUTTON, self.on_click)
        
        hsizer = wx.BoxSizer(wx.HORIZONTAL)
        hsizer.Add(self.text_entry, 1) 
