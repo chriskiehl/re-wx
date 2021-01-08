@@ -8,21 +8,52 @@ A library for building modern declarative desktop applications in WX.
  * Component based -  
  * complete interop with the rest of your WX codebase - re-wx doesn't require you to change anything about your current codebase to start using it. Just create a component, attach it to an existing set of WX widgets, and off you go! 
  
-re-wx is an implementation of React's ideas _on top_ of WX. re-wx lets you leverage WX native widgets while building using modern dev practices.   
-
-
+re-wx is an implementation of React's ideas _on top_ of WX Python. It allows you to decouple your state and logic from your UI, and declaratively state blah blah blah. 
 
 
 
 ```python
 
-def footer(props): 
+def controls(props): 
     return wsx(
         [Block, {'orient': wx.HORIZONTAL}, 
           [Button, {'on_click': props['on_start'], 'label': 'Ok'}],
           [Button, {'on_click': props['on_cancel'], 'label': 'Cancel'}]]
     )
 ```
+
+### virtualframe and diffing 
+
+### WSX
+
+`create_element` is the fundamental building block of all of re-wx. However, its verbose and can make viewing your UIs structure at a glance difficult as it gets lost in a sea of method call noise. As an alternative, you can use list to represent elements in a syntax which loosely resembles HTML (if you squint a lot). 
+
+```python
+def my_component(props): 
+   return wsx(
+     [Block, {'orient': wx.VERTICAL}, 
+       [Block, {'orient': wx.HORIZONTAL}, 
+         [StaticText, {'label': 'Foobar'}],
+         [Button, {'label': 'Submit', 'on_click': props['on_click']}]]]
+   )
+```
+
+the `wsx` call will transform that into the equivalent form 
+
+```python
+def my_component(props): 
+   return create_element(Block, {'orient': wx.VERTICAL}, children=[
+       create_element(Block, {'orient': wx.HORIZONTAL}, children=[
+           create_element(StaticText, {'label': 'Foobar'})
+           create_element(StaticText, {'label': 'Submit', 'on_click': props['on_click']})
+       ])
+       
+   ])
+```
+
+Two paths to the same place, so you can use whichever one feels most natural. 
+
+
 
 WX Widgets currently managed by re-wx. 
 
@@ -73,10 +104,6 @@ class Clock(Component):
         self.timer.Start(milliseconds=1000)
 
     def update_clock(self):
-        """
-        We use self.set_state to modify the internal state of the component.
-        A render will happen when state or props change, causing the UI to update.
-        """
         self.set_state({'time': datetime.datetime.now()})
 
     def render(self):
@@ -92,10 +119,11 @@ class Clock(Component):
         )
 ```
 
-# tradeoffs:
+## Philosophy
 
-Practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. Here we'd just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, Python can block in place without affecting the main UI thread. Which allows writing 
-straight forward in-line Dialog code.  
+re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native UIs in WX easier. As such, it doesn't need reconcilers, or generic transactions, or any of the React bloat. re-wx entire codebase is just a handful of files < 1k lines of code, and could be understood in an afternoon.  
+
+Practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which allows writing straight forward in-line Dialog code.  
 
 ```python
 def handle_choose_dir(self, event): 
