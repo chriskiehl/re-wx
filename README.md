@@ -4,10 +4,49 @@
 
 A library for building modern declarative desktop applications in WX.
 
+**Say goodbye to** 
+
+* thinly wrapped python skins on old bloated C++ classes 
+* low level `A.addChild(B)` plumbing code to represent your UI. 
+* coupling your business logic 
+
+**re-wx** is declarative. You tell re-wx what you want your program to do, and it'll go do all the heavy lifting to get WX to comply. re-wx let's you directly express the relationships between components. 
+
+```
+class FormControls(wx.Panel): 
+    def __init__(*args, **kwargs): 
+       super().__init__(*args, **kwargs)
+       self.text_entry = wx.TextCtrl(self)
+       self.button = wx.Button(self, label='Ok')
+       
+       hsizer = wx.BoxSizer(wx.HORIZONTAL)
+       hsizer.Add(self.text_entry, 1) 
+       hsizer.Add(self.button, 0)
+       vsizer = wx.BoxSizer(wx.VERTICAL) 
+       vsizer.Add(hsizer, 1, wx.EXPAND)
+       self.SetSizer(vsizer)
+```
+
+## with RE-WX 
+
+```python
+def my_component(props): 
+   return wsx(
+     [Block, {'orient': wx.VERTICAL}, 
+       [Block, {'orient': wx.HORIZONTAL}, 
+         [StaticText, {'label': 'Foobar'}],
+         [Button, {'label': 'Submit', 'on_click': props['on_click']}]]]
+   )
+```
+
+
+
  * Declarative: 
  * Component based -  
  * complete interop with the rest of your WX codebase - re-wx doesn't require you to change anything about your current codebase to start using it. Just create a component, attach it to an existing set of WX widgets, and off you go! 
- 
+
+Get away from managing the low level details of WX's individual widgets and components. You tell re-wx what you want your UI to do, and it'll do all the heavy lifting to get WX to comply.  
+
 re-wx is an implementation of React's ideas _on top_ of WX Python. It allows you to decouple your state and logic from your UI, and declaratively state blah blah blah. 
 
 
