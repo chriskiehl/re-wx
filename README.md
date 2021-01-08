@@ -2,17 +2,68 @@
   <img src="https://github.com/chriskiehl/re-wx-images/raw/images/logo/rewx.png"> 
 </p>
 
-A library for building modern declarative desktop applications in WX.
+A Python library for building modern declarative desktop applications in WX
+
+<hr/>
+
+![PyPI](https://img.shields.io/pypi/v/gooey)
+
+
+# Overview
+
+re-wx is a library for building modern declarative desktop applications. It's built on top of WXPython, so you get an extremely performant, cross platform applications using _natively rendered_ widgets out of the box. re-wx takes the ideas from React and applies them to WX. With re-wx, you can express what you want your program to do, and it'll do all the heavy lifting of getting WX's widgets to comply. 
+
+
+### Flexible
+
+You can use as little or as much of re-wx's capabilities as you want. Meaning, if you don't buy into the state management or data oriented aspects, you can use re-wx purely as a more declarative way of managing layouts in WX, while still managing all other interactions the traditional way.  
+
+```python
+class MyPanel(wx.Panel): 
+    def __init__(*args, **kwargs): 
+        super().__init__(*args)
+        self.input1 = rewx.Ref() 
+        self.input2 = rewx.Ref() 
+        self.button = rewx.Ref() 
+        render(self.layout(), self) 
+        
+    def component_did_mount(self): 
+        # Your layout has been built and 
+        # all components instantiated. You can now 
+        # proceed as usual. 
+        self.input1.instance.Bind(wx.EVT_TEXT, self.my_handler1)
+        self.input2.instance.Bind(wx.EVT_TEXT, self.my_handler2)
+        # and so on       
+        
+    def layout(self): 
+        return rsx(
+            [StaticText, {'ref': self.input1}]
+        )
+        
+        
+
+```
+
+
+A library for building modern, performant, natively 
+
+re-wx is an implementation of the ideas from React on top of WxPython. It brings data focused, declarative programming to WX so that the application is driven from state, not the other wayt around. 
+
+Decouple yourself from the low-level details. 
+
+
+
+
 
 **Say goodbye to** 
 
-* thinly wrapped python skins on old bloated C++ classes 
-* low level `A.addChild(B)` plumbing code to represent your UI. 
-* coupling your business logic 
+* Thinly wrapped python skins on old bloated C++ classes 
+* Deep coupling of business logic to stateful widgets
+* Trying to express UIs through low level `A.addChild(B)` plumbing code 
 
 **re-wx** is declarative. You tell re-wx what you want your program to do, and it'll go do all the heavy lifting to get WX to comply. re-wx let's you directly express the relationships between components. 
 
-```
+```python
 class FormControls(wx.Panel): 
     def __init__(*args, **kwargs): 
        super().__init__(*args, **kwargs)
@@ -66,7 +117,7 @@ def controls(props):
 
 ### WSX
 
-`create_element` is the fundamental building block of all of re-wx. However, its verbose and can make viewing your UIs structure at a glance difficult as it gets lost in a sea of method call noise. As an alternative, you can use list to represent elements in a syntax which loosely resembles HTML (if you squint a lot). 
+`create_element` is the fundamental building block of all of re-wx. However, it's a bit verbose and can make viewing your UI's structure at a glance difficult as it gets lost in a sea of method call noise. As an alternative, `wsx` lets you use nested lists to express parent child relationships between components. 
 
 ```python
 def my_component(props): 
@@ -78,7 +129,7 @@ def my_component(props):
    )
 ```
 
-the `wsx` call will transform that into the equivalent form 
+the `wsx` call will transform the lists into an equivalent `create_element` form 
 
 ```python
 def my_component(props): 
@@ -87,7 +138,6 @@ def my_component(props):
            create_element(StaticText, {'label': 'Foobar'})
            create_element(StaticText, {'label': 'Submit', 'on_click': props['on_click']})
        ])
-       
    ])
 ```
 
