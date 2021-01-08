@@ -11,7 +11,7 @@ A Python library for building modern declarative desktop applications in WX
 
 # Overview
 
-re-wx is a library for building modern declarative desktop applications. It's built on top of WXPython, so you get performant, cross platform, and natively rendered applications right out of the box. It's inspired by React and brings ideals like the virtualdom, Components, and declarative programming to the world of WX. 
+re-wx is a library for building modern declarative desktop applications. It's inspired by React and brings ideas like the virtualdom, composable UI components, and declarative programming to the old crusty world of native UI kits. Built on WxPython, re-wx lets you create performant, cross platform, and _natively rendered_ applications with ease.
 
 
 
