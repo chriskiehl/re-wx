@@ -258,6 +258,8 @@ if __name__ == '__main__':
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
 
+Components allow you to store and manage state. Behind the scenes, re-wx handles the details of making WX's widgets match your applications state. 
+
 ```python
 class Clock(Component):
     def __init__(self, props):
