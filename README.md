@@ -144,8 +144,45 @@ class Clock(Component):
                            'flag': wx.CENTER | wx.ALL,
                            'border': 60}]]
         )
+        
+if __name__ == '__main__':
+    app = wx.App()
+    frame = wx.Frame(None, title='Clock')
+    clock = render(create_element(Clock, {}), frame)
+    frame.Show()
+    app.MainLoop()        
 ```
 
+Here we've setup a Component which keeps track of the current time and displays that time nice and bold in the center of our frame. 
+
+There's lot going on here, so we'll take if from the top! 
+
+You define your own components by inheriting from `rewx.Component`. This gives you access to all the lifecycle and state management options provided by the base class. 
+
+Components have a few notable methods: 
+
+| Method | Usage | 
+|--------|-------|
+| `__init__` | This gets called when re-wx instantiates your class. This is where you specify your initial state. Note that this is called _before_ the actual GUI elements are available. This method should be used only to initialize data, not deal with presentational concerns |
+| `render` | This is where you'll create your element tree which defines your UI. | 
+| `component_did_mount` | This method is called once all of your Component's elements have been rendered and mounted onto a wx.Window. It's here that you can kick off any work which requires the GUI to be up and running|
+| set_state | This method is used update your components state and kick off a re-render of its visuals.| 
+
+**Still just an element**
+
+You use your component like any other Element we've encountered so far. Meaning, you don't instantiate it directly, you put in in your Element tree and let re-wx handle all the details. 
+
+That's what we're doing down at the bottom of the file where we wire the app together. We create an Element from our Component just like normal: `create_element(Clock, {})` and pass it to our render function. 
+
+```
+if __name__ == '__main__':
+    app = wx.App()
+    frame = wx.Frame(None, title='Clock')
+    clock = render(create_element(Clock, {}), frame)
+    frame.Show()
+    app.MainLoop()  
+```    
+   
 
 
 
@@ -154,6 +191,7 @@ class Clock(Component):
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/todo-app.png" align=right >
 
+Our final example will pull it all together. It combines plain Elements, Components, and business logic into a complete application. 
 ```python 
 def TodoList(props):
     return create_element(c.Block, {}, children=[
