@@ -50,30 +50,57 @@ pip install rewx
 
 ## re-wx in 5 minutes
 
-re-wx has just a few core ideas: Elements, Components, and rendering. 
+re-wx has just a few core ideas: Elements, Components, and rendering. Everything else is achieved by combining these 3 ideas into larger and larger things. 
 
-### A tiny Hello World
+### Starting small: Hello World
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
-You can assemble applications with re-wx using the humble function. This takes data and returns data. re-wx handles all the lifting required to build the WX instances. 
-
-
 
 ```python
 import wx
-from rewx import create_element, wsx, render
+from rewx import create_element, wsx, render     
 from rewx.components import StaticText, Frame
 
-def say_hello(props):
-    return create_element(Frame, {'title': 'My First re-wx app', 'show': True}, children=[
-        create_element(StaticText, {'label': f'Hello, {props["name"]}!'})
-    ])
-
 if __name__ == '__main__':
-    app = wx.App()
-    frame = render(create_element(say_hello, {'name': 'cool person'}), None)
+    app = wx.App()    
+    element = create_element(Frame, {'title': 'My Cool Application', 'show': True}, children=[
+        create_element(StaticText, {'label': 'Howdy, cool person!'})
+    ])
+    frame = render(element, None)
+    frame.Show()
     app.MainLoop()
 ```
+
+Run this and you'll see the output on the right. While not glamorous yet, it lets us explore several of the main ideas. 
+
+At the heart of all re-wx applications is the humble `Element`. We used the function `create_element` to build them. Applications are built by composing trees of these elements together into larger and larger composite structures. 
+
+Here we've created two elements. A top-level `Frame` type, which is required by WXPython, and then an inner `StaticText` one, which displays text on the screen. 
+
+Elements all consist of three pieces of data: 1. the `type` of the entity we want to render into the UI, 3. the properties ("props" from here on out) we want that entity to have, and 3. any children, which are themselves Elements. 
+
+An important note is that Elements are _plain data_ -- literally just a Python map. Together, they make up the "virtualdom" used by re-wx uses to drive the underlying WXWidgets components. Creating an element _does not_ instantiate any WX elements. That job falls to `render` 
+
+`rewx.render` is how we transform our tree of Elements into a live UI. It handles all of the lifting required to instantiate the WX Objects, associate them all together, and put them in the state specified by your tree. The output of `render` is a WX Object, which in our case, is our top level frame. 
+
+With the frame now happily created, we just have to tell WXPython to start its main loop, which will launch the GUI, and we've officially built our first re-wx API. 
+
+### A bried detour for WSX:
+
+Writing all those `create_element` statements can get really tedious and visually noisey to the point where it makes viewing your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
+
+```python 
+from rewx import wsx 
+...
+element = wsx(
+  [Frame, {'title': 'My Cool Application', 'show': True}, 
+    [StaticText, {'label': 'Howdy, cool person!'}]]
+)
+```
+
+
+
+
 
 <br/><br/>
 ### A Stateful component 
