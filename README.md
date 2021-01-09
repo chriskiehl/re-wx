@@ -27,6 +27,8 @@ Re-wx lets you build expressive, maintainable applications out of simple, testab
 
 **A tiny Hello World:**
 
+<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
+
 ```python
 import wx
 from rewx import create_element, wsx, render
@@ -35,7 +37,7 @@ from rewx.components import StaticText, Frame
 
 def say_hello(props):
     return wsx(
-        [Frame, {'title': 'My first re-wx app'},
+        [Frame, {'title': 'My first re-wx app', 'show': True},
          [StaticText, {'label': f'Hello, {props["name"]}!'}]]
     )
 
@@ -43,11 +45,13 @@ def say_hello(props):
 if __name__ == '__main__':
     app = wx.App()
     frame = render(create_element(say_hello, {'name': 'cool person'}), None)
-    frame.Show()
     app.MainLoop()
 ```
 
 
+
+
+Note that re-wx is _"just"_ a library, _not_ a framework. It 100% compatible with your existing WX codebase. You can use as much or as little of re-wx as you want. 
 
 
 ## Installation 
