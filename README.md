@@ -5,6 +5,7 @@
 <p align="center">A Python library for building modern declarative desktop applications</p>
 
 <hr/>
+
 ![PyPI](https://img.shields.io/pypi/v/gooey)
 
 
