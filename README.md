@@ -23,7 +23,7 @@ It's a "virtualdom" for WX. You tell re-wx what you want to happen, and it'll do
 * Awkward auto-generated Python wrappers on old bloated C++ classes 
 * Being forced to express UIs through low level `A.GetLayout().addChild(B)` style plumbing code 
 
-Re-wx lets you build expressive, maintainable applications out of simple, testable, pure functions.
+Re-wx lets you build expressive, maintainable applications out of simple, testable, functions and components.
 
 **A tiny Hello World:**
 
@@ -56,9 +56,13 @@ Note that re-wx is _"just"_ a library, _not_ a framework. It 100% compatible wit
 
 ## Installation 
 
+The latest stable version is available on PyPi. 
 ```
 pip install rewx 
 ```
+
+
+
 
 ## quick start 
 
@@ -72,11 +76,6 @@ It's built on top of WXPython, so you get an extremely performant, cross platfor
 **Declarative:** You tell re-wx what you want your program to do, and it'll go do all the heavy lifting to get WX to comply. 
 
 **Expressive:** Say goodbye to trying to express UI layouts with the low level `A.addChild(B)` style plumbing code of WXPython.  
-
-
-### Why not Electron? 
-
-With re-wx, you can build performant, 
 
 
 
@@ -103,7 +102,7 @@ class MyPanel(wx.Panel):
         # and so on       
         
     def layout(self): 
-        return rsx(
+        return wsx(
             [StaticText, {'ref': self.input1}]
         )
         
@@ -112,14 +111,31 @@ class MyPanel(wx.Panel):
 ```
 
 
-A library for building modern, performant, natively 
 
-re-wx is an implementation of the ideas from React on top of WxPython. It brings data focused, declarative programming to WX so that the application is driven from state, not the other wayt around. 
+Tutorial: 
 
-Decouple yourself from the low-level details. 
+The core of re-wx is the humble `Element`. It's just a piece of plain data that describes the type of component to create, what its properties should be, and if it should have any children. 
 
+```
+from rewx import create_element
+from rewx import StaticText 
 
+my_first_elelement = create_element(StaticText, {'label': 'Hello world!'})
+```
 
+You build UIs in re-wx by creating trees of these components. 
+
+```
+from rewx import create_element
+from rewx import StaticText, Block  
+
+a_tree_of_elements = create_element(Block, {}, children= [
+    create_element(StaticText, {'label': 'I am the first child!'}),
+    create_element(StaticText, {'label': 'I am the second!'})
+])
+```
+
+You assemble UIs in re-wx by assembling trees of _Components_ and _Elements_. Components are functions or classes which  
 
 
 
