@@ -36,7 +36,10 @@ pip install rewx
 
 * Tutorial: Intro to re-wx 
 * Main Concepts 
+* Advanced Concepts
 * Debugging 
+
+
 
 <h2 align="center">RE-WX in Action!</h2>
 
@@ -67,7 +70,7 @@ if __name__ == '__main__':
     app.MainLoop()
 ```
 
-
+<br/><br/>
 ### A Stateful component 
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
@@ -105,7 +108,7 @@ class Clock(Component):
 ```
 
 
-
+<br/><br/>
 ### An Application
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/todo-app.png" align=right >
@@ -157,21 +160,6 @@ Note that re-wx is _"just"_ a library, _not_ a framework. It 100% compatible wit
 
 
 
-
-
-
-## quick start 
-
-
-## Why WX?
-
-re-wx is focused on building _native_ applications. WX uses the actual APIs of the host system to render real widgets, thus matching the look and feel of the OS on which its running. This also means that WX is _fast_. It's not emulating 
-
-It's built on top of WXPython, so you get an extremely performant, cross platform applications using _natively rendered_ widgets right out of the box. 
-
-**Declarative:** You tell re-wx what you want your program to do, and it'll go do all the heavy lifting to get WX to comply. 
-
-**Expressive:** Say goodbye to trying to express UI layouts with the low level `A.addChild(B)` style plumbing code of WXPython.  
 
 
 
@@ -335,9 +323,13 @@ Development in WX blows.Wrappers around C++ classes. Evertything requires subcla
 
 ## Philosophy
 
-re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native UIs in WX easier. As such, it doesn't need reconcilers, or generic transactions, or any of the React bloat. re-wx entire codebase is just a handful of files < 1k lines of code, and could probably be understood in an afternoon.  
+**It's a library first.**
+re-wx is "just" a library. it is _not_ a framework. You can use as much or as little of it as you need. Further, the output from a re-wx `render` is a plain old WXPython component. Meaning, all re-wx components _ARE_ WX components, and thus require no special handling to integrate with your existing code base. 
 
-As such, practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which allows writing straight forward in-line Dialog code.  
+**It is not trying to hide WXPython** 
+re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native, cross-platform UIs in WXPython easier. As such, it doesn't need reconcilers, or generic transactions, or any other bloat. re-wx entire codebase is just a handful of files < 1k lines of code, and could be understood in an afternoon.  
+
+As such, practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which enables writing straight forward in-line Dialog code.  
 
 ```python
 def handle_choose_dir(self, event): 
@@ -350,7 +342,7 @@ Events: re-wx does no event wrapping. The normal WX events are used.
 
 It's not trying to be an opaque framework hiding away the internal details of WX. It's very much designed to operate on-top of and in concert with WX. 
 
-# compromises
+## Compromises and caveats in the design
 
 It's not a true one-way data flow for certain components. For instance, in WX, ComboBoxes only produce events _after_ it's internally updated its state. 
 
