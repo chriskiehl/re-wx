@@ -38,7 +38,7 @@ The latest stable version is available on PyPi.
 pip install rewx 
 ```
 
-## Getting Started 
+## Documentation 
 
 * [Tutorial: Intro to re-wx](#TODO)
 * [Main Concepts ](#TODO)
@@ -48,11 +48,9 @@ pip install rewx
 * [Getting Help](#TODO) 
 
 
-## Examples: 
+## re-wx in 5 minutes
 
-
-
-<h2 align="center">RE-WX in Action!</h2>
+re-wx has just a few core ideas: Elements, Components, and rendering. 
 
 ### A tiny Hello World
 
@@ -66,13 +64,10 @@ import wx
 from rewx import create_element, wsx, render
 from rewx.components import StaticText, Frame
 
-
 def say_hello(props):
-    return wsx(
-        [Frame, {'title': 'My first re-wx app', 'show': True},
-         [StaticText, {'label': f'Hello, {props["name"]}!'}]]
-    )
-
+    return create_element(Frame, {'title': 'My First re-wx app', 'show': True}, children=[
+        create_element(StaticText, {'label': f'Hello, {props["name"]}!'})
+    ])
 
 if __name__ == '__main__':
     app = wx.App()
@@ -165,9 +160,17 @@ if __name__ == '__main__':
 
 
 
-Note that re-wx is _"just"_ a library, _not_ a framework. It 100% compatible with your existing WX codebase. You can use as much or as little of re-wx as you want. 
 
 
+## Examples: 
+
+Here are a few samples of the applications availble in the [Examples Repo](#TODO). Check it out and contribute your own re-wx application demos! 
+
+| Flat Layout | Column Layout |Success Screen | Error Screen | Warning Dialog |
+|-------------|---------------|---------------|--------------|----------------|
+| <img src="https://cloud.githubusercontent.com/assets/1408720/7950190/4414e54e-0965-11e5-964b-f717a7adaac6.jpg"> | <img src="https://cloud.githubusercontent.com/assets/1408720/7950189/4411b824-0965-11e5-905a-3a2b5df0efb3.jpg"> | <img src="https://cloud.githubusercontent.com/assets/1408720/7950192/44165442-0965-11e5-8edf-b8305353285f.jpg"> | <img src="https://cloud.githubusercontent.com/assets/1408720/7950188/4410dcce-0965-11e5-8243-c1d832c05887.jpg"> | <img src="https://cloud.githubusercontent.com/assets/1408720/7950191/4415432c-0965-11e5-9190-17f55460faf3.jpg"> | 
+
+<h2 align="center">RE-WX in Action!</h2>
 
 
 
