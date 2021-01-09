@@ -83,11 +83,11 @@ An important note is that Elements are _plain data_ -- literally just a Python m
 
 `rewx.render` is how we transform our tree of Elements into a live UI. It handles all of the lifting required to instantiate the WX Objects, associate them all together, and put them in the state specified by your tree. The output of `render` is a WX Object, which in our case, is our top level frame. 
 
-With the frame now happily created, we just have to tell WXPython to start its main loop, which will launch the GUI, and we've officially built our first re-wx API. 
+With the frame now happily created, we just have to tell WXPython to start its main loop, which will launch the GUI, and we've officially built our first re-wx app! 
 
 ### A bried detour for WSX:
 
-Writing all those `create_element` statements can get really tedious and visually noisey to the point where it makes viewing your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
+Writing all those `create_element` statements can get really tedious and creates a lot of visual noise which makes getting a feel for your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
 
 ```python 
 from rewx import wsx 
@@ -98,8 +98,7 @@ element = wsx(
 )
 ```
 
-
-
+For the rest of this guide, we'll be using the `wsx` form, but you can use `create_element` if you prefer. 
 
 
 <br/><br/>
@@ -107,7 +106,7 @@ element = wsx(
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
 
-Components allow you to store and manage state. Behind the scenes, re-wx handles the details of making WX's widgets match your applications state. 
+Components allow you to store and manage state. 
 
 ```python
 class Clock(Component):
