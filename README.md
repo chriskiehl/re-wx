@@ -13,26 +13,39 @@
 
 re-wx is a library for building modern declarative desktop applications. It's built as a management layer on top of WXPython, which means you get all the goodness of a mature, native, cross-platform UI kit, wrapped up in a modern, React inspired API. 
 
-
-It's inspired by React and brings ideas like the virtualdom, composable UI components, and declarative programming to the old crusty world of native UI kits. Built on WxPython, re-wx lets you create performant, cross platform, and _natively rendered_ applications with ease.
-
 ## What is it? 
 
-It's a "virtualdom" for WX. Decouple yourself from low-level WX code. You tell re-wx what you want to happen, and it'll do all the heavy lifting required to get WX to comply. It lets you focus on your state and transitions leaving implentation details of WX's ancient API to re-wx.  
-
-A new way of declaratively expressing UI layouts. 
+It's a "virtualdom" for WX. You tell re-wx what you want to happen, and it'll do all the heavy lifting required to get WX to comply. It lets you focus on your state, transitions, and business logic while leaving implentation details of WX's ancient API to re-wx.  
 
 **Say goodbye to** 
 
-* Fighting auto-generated thin Python wrappers on old bloated C++ classes 
 * Deep coupling of business logic to stateful widgets
-* Trying to express UIs through low level `A.addChild(B)` plumbing code 
+* Awkward auto-generated Python wrappers on old bloated C++ classes 
+* Being forced to express UIs through low level `A.GetLayout().addChild(B)` style plumbing code 
+
+Re-wx lets you build expressive, maintainable applications out of simple, testable, pure functions.
+
+**A tiny Hello World:**
+
+```python
+import wx
+from rewx import create_element, wsx, render
+from rewx.components import StaticText, Frame
 
 
+def say_hello(props):
+    return wsx(
+        [Frame, {'title': 'My first re-wx app'},
+         [StaticText, {'label': f'Hello, {props["name"]}!'}]]
+    )
 
 
-
-
+if __name__ == '__main__':
+    app = wx.App()
+    frame = render(create_element(say_hello, {'name': 'cool person'}), None)
+    frame.Show()
+    app.MainLoop()
+```
 
 
 
