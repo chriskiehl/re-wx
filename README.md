@@ -25,9 +25,28 @@ It's a "virtualdom" for WX. You tell re-wx what you want to happen, and it'll do
 
 Re-wx lets you build expressive, maintainable applications out of simple, testable, functions and components.
 
+## Installation 
+
+The latest stable version is available on PyPi. 
+```
+pip install rewx 
+```
+
+## Documentation
+
+* Tutorial: Intro to re-wx 
+* Main Concepts 
+* Debugging 
+
+<h2 align="center">RE-WX in Action!</h2>
+
+
 **A tiny Hello World:**
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
+You can assemble applications with re-wx using the humble function. This takes data and returns data. re-wx handles all the lifting required to build the WX instances. 
+
+
 
 ```python
 import wx
@@ -49,17 +68,92 @@ if __name__ == '__main__':
 ```
 
 
+### A Stateful component 
+
+<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
+
+Components allow you to store and manage state. Behind the scenes, re-wx handles the details of making WX's widgets match your applications state. 
+
+```python
+class Clock(Component):
+    def __init__(self, props):
+        super().__init__(props)
+        self.timer = None
+        self.state = {
+            'time': datetime.datetime.now()
+        }
+
+    def component_did_mount(self):
+        self.timer = wx.Timer()
+        self.timer.Notify = self.update_clock
+        self.timer.Start(milliseconds=1000)
+
+    def update_clock(self):
+        self.set_state({'time': datetime.datetime.now()})
+
+    def render(self):
+        return wsx(
+          [c.Block, {},
+           [c.StaticText, {'label': self.state['time'].strftime('%I:%M:%S'),
+                           'name': 'ClockFace',
+                           'foreground_color': '#51acebff',
+                           'font': big_ol_font(),
+                           'proporton': 1,
+                           'flag': wx.CENTER | wx.ALL,
+                           'border': 60}]]
+        )
+```
+
+
+
+## The required TODO application
+
+```python 
+def TodoList(props):
+    return create_element(c.Block, {}, children=[
+        create_element(c.StaticText, {'label': f" * {item}"})
+        for item in props['items']
+    ])
+
+
+class TodoApp(Component):
+    def __init__(self, props):
+        super().__init__(props)
+        self.state = {'items': ['Groceries', 'Laundry'], 'text': ''}
+
+    def handle_change(self, event):
+        self.set_state({**self.state, 'text': event.String})
+
+    def handle_submit(self, event):
+        self.set_state({
+            'text': '',
+            'items': [*self.state['items'], self.state['text']]
+        })
+
+    def render(self):
+        return wsx(
+            [c.Frame, {'title': 'My First TODO app'},
+             [c.Block, {'name': 'main-content'},
+              [c.StaticText, {'label': 'What needs to be done?'}],
+              [c.TextCtrl, {'value': self.state['text']}],
+              [c.Button, {'label': 'Add', 'on_click': self.handle_submit}],
+              [c.StaticText, {'label': 'TO DO:'}],
+              [TodoList, {'items': self.state['items'], 'on_click': self.handle_complete}]]]
+        )
+
+if __name__ == '__main__':
+    app = wx.App()
+    frame = render(create_element(TodoApp, {}), None)
+    frame.Show()
+    app.MainLoop()
+```
+
 
 
 Note that re-wx is _"just"_ a library, _not_ a framework. It 100% compatible with your existing WX codebase. You can use as much or as little of re-wx as you want. 
 
 
-## Installation 
 
-The latest stable version is available on PyPi. 
-```
-pip install rewx 
-```
 
 
 
@@ -234,105 +328,6 @@ Rationale:
 
 Development in WX blows.Wrappers around C++ classes. Evertything requires subclassing a low-level plumbing code 
 
-<h2 align="center">Quick Demos!</h2>
-
-<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
-
-**Starting Small.** You can assemble applications with re-wx using the humble function. This takes data and returns data. re-wx handles all the lifting required to build the WX instances. 
-
-```python
-from app import basicapp
-from rewx import create_element
-from rewx.components import StaticText
-
-def say_hello(props):
-    return create_element(StaticText, {'label': f'Howdy, {props["name"]}!'})
-
-if __name__ == '__main__':
-    element = create_element(say_hello, {'name': 'cool person'})
-    basicapp(element, title='My Cool Application!', debug=True)
-```  
-
-
-### A Stateful component 
-
-<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
-
-Components allow you to store and manage state. Behind the scenes, re-wx handles the details of making WX's widgets match your applications state. 
-
-```python
-class Clock(Component):
-    def __init__(self, props):
-        super().__init__(props)
-        self.timer = None
-        self.state = {
-            'time': datetime.datetime.now()
-        }
-
-    def component_did_mount(self):
-        self.timer = wx.Timer()
-        self.timer.Notify = self.update_clock
-        self.timer.Start(milliseconds=1000)
-
-    def update_clock(self):
-        self.set_state({'time': datetime.datetime.now()})
-
-    def render(self):
-        return wsx(
-          [c.Block, {},
-           [c.StaticText, {'label': self.state['time'].strftime('%I:%M:%S'),
-                           'name': 'ClockFace',
-                           'foreground_color': '#51acebff',
-                           'font': big_ol_font(),
-                           'proporton': 1,
-                           'flag': wx.CENTER | wx.ALL,
-                           'border': 60}]]
-        )
-```
-
-
-
-## The required TODO application
-
-```python 
-def TodoList(props):
-    return create_element(c.Block, {}, children=[
-        create_element(c.StaticText, {'label': f" * {item}"})
-        for item in props['items']
-    ])
-
-
-class TodoApp(Component):
-    def __init__(self, props):
-        super().__init__(props)
-        self.state = {'items': ['Groceries', 'Laundry'], 'text': ''}
-
-    def handle_change(self, event):
-        self.set_state({**self.state, 'text': event.String})
-
-    def handle_submit(self, event):
-        self.set_state({
-            'text': '',
-            'items': [*self.state['items'], self.state['text']]
-        })
-
-    def render(self):
-        return wsx(
-            [c.Frame, {'title': 'My First TODO app'},
-             [c.Block, {'name': 'main-content'},
-              [c.StaticText, {'label': 'What needs to be done?'}],
-              [c.TextCtrl, {'value': self.state['text']}],
-              [c.Button, {'label': 'Add', 'on_click': self.handle_submit}],
-              [c.StaticText, {'label': 'TO DO:'}],
-              [TodoList, {'items': self.state['items'], 'on_click': self.handle_complete}]]]
-        )
-
-if __name__ == '__main__':
-    app = wx.App()
-    frame = render(create_element(TodoApp, {}), None)
-    frame.Show()
-    app.MainLoop()
-```
 
 
 
@@ -423,4 +418,9 @@ Or feel free to hit me up at me@chriskiehl.com
 
 ## Contributing
 
-All contributions are welcome!
+All contributions are welcome! Just make sure you follow the Contributing Guidelines. 
+
+
+## License
+
+re-wx is MIT licensed.
