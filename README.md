@@ -51,6 +51,14 @@ pip install rewx
 ## re-wx in 5 minutes
 
 re-wx has just a few core ideas: Elements, Components, and rendering. Everything else is achieved by combining these 3 ideas into larger and larger things. 
+3 things 
+
+A re-wx application consists of three steps. 
+
+1. define your application view
+2. Rendering  it to produce a wx object
+3. kick off the wx Main Loop. 
+
 
 ### Starting small: Hello World
 
@@ -85,9 +93,9 @@ An important note is that Elements are _plain data_ -- literally just a Python m
 
 With the frame now happily created, we just have to tell WXPython to start its main loop, which will launch the GUI, and we've officially built our first re-wx app! 
 
-### A bried detour for WSX:
+### A brief detour for WSX:
 
-Writing all those `create_element` statements can get really tedious and creates a lot of visual noise which makes getting a feel for your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
+Writing all those `create_element` statements can get really tedious and creates a lot of visual noise which can make getting a feel for your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
 
 ```python 
 from rewx import wsx 
@@ -137,6 +145,8 @@ class Clock(Component):
                            'border': 60}]]
         )
 ```
+
+
 
 
 <br/><br/>
