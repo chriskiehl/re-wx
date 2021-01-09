@@ -64,7 +64,8 @@ def updatewx(instance, props):
 def patch(dom: wx.Window, vdom):
     parent = dom.GetParent()
     try:
-        parent.Freeze()
+        # if parent:
+        #     parent.Freeze()
         if not isclass(vdom['type']):
             # because stateless functions are just opaque wrappers
             # they have no relevant diffing logic -- there is no
@@ -87,9 +88,33 @@ def patch(dom: wx.Window, vdom):
                 key = f'__index_{index}'
                 if key in pool:
                     patch(pool[key], child)
+                    del pool[key]
                 else:
-                    parent.RemoveChild(pool[key])
-                    render(child, parent)
+                    # TODO: this IS the addition case, right?
+                    # why would I need this removeChild line..?
+                    if key in pool:
+                        # if we're adding something new to the
+                        # tree, it won't be present in the pool
+                        parent.RemoveChild(pool[key])
+                    # TODO: need to understand this case more
+                    # if we're not updating, we're adding
+                    # in which case.. why doesn't this fall to the
+                    # `dom` instance..?
+                    inst = render(child, dom)
+                    if dom.GetSizer():
+                        dom.GetSizer().Add(
+                            inst,
+                            child['props'].get('proportion', 0),
+                            child['props'].get('flag', 0),
+                            child['props'].get('border', 0)
+                        )
+            # any keys which haven't been removed in the
+            # above loop represent wx.Objects which are no longer
+            # part of the virtualdom and should thus be removed.
+            for key, orphan in pool.items():
+                dom.RemoveChild(orphan)
+                orphan.Destroy()
+
             newdom = dom
         else:
             raise Exception("unexpected case!")
@@ -99,7 +124,12 @@ def patch(dom: wx.Window, vdom):
             p = p.GetParent()
         return newdom
     finally:
-        parent.Thaw()
+        # TODO: we sometimes call parent.Thaw() when
+        # parent isn't frozen. I think this has something
+        # to do with the child removal case. Not sure tho
+        # if parent and parent.IsFrozen():
+        #     parent.Thaw()
+        pass
 
 
 class Component:
@@ -117,6 +147,7 @@ class Component:
             instance.base._instance = instance
             instance.base._key = vdom['props'].get('key', None)
             instance.component_did_mount()
+
             return instance.base
         else:
             # TODO: what are the cases where this would be hit..?
@@ -134,7 +165,13 @@ class Component:
             return patch(dom, vdom['type'](vdom['props']))
 
 
+
+
     def component_did_mount(self):
+        pass
+
+    def component_will_unmount(self):
+        print('gooodbye!')
         pass
 
     def render(self):
@@ -143,7 +180,12 @@ class Component:
     def set_state(self, next_state):
         prev_state = self.state
         self.state = next_state
+        p = self.base
+        while p.GetParent() != None:
+            p = p.GetParent()
+        p.Freeze()
         patch(self.base, self.render())
+        p.Thaw()
 
 
 

@@ -1,11 +1,17 @@
 import wx
 import wx.adv
+import wx.media
+import wx.svg
 # TODO: warn on unknown props?
+import os
+
 from rewx.dispatch import mount, update
 
-from rewx.components import Block, Grid, TextArea
+from rewx.components import Block, Grid, TextArea, SVG,SVGButton
 from rewx.util import exclude
 
+
+dirname = os.path.dirname(__file__)
 
 def noop(*args, **kwargs):
     return None
@@ -43,7 +49,28 @@ def set_basic_props(instance, props):
             pass
     return instance
 
+@mount.register(wx.Frame)
+def frame(element, parent) -> wx.Frame:
+    return update(element, wx.Frame(None))
 
+@update.register(wx.Frame)
+def frame(element, instance: wx.Frame):
+    props = element['props']
+    set_basic_props(instance, props)
+    if 'title' in props:
+        instance.SetTitle(props['title'])
+    if 'show' in props:
+        instance.Show(props['show'])
+    if 'icon_uri' in props:
+        instance.SetIcon(wx.Icon(props['icon_uri']))
+    else:
+        instance.SetIcon(wx.Icon(os.path.join(dirname, 'icon.png')))
+    return instance
+    # if props.get('start'):
+    #     instance.Stop()
+    # else:
+    #     instance.Stop()
+    # return instance
 
 
 @mount.register(wx.ActivityIndicator)
@@ -245,6 +272,89 @@ def listctrl(element, instance: wx.ListCtrl):
     return instance
 
 
+@mount.register(wx.media.MediaCtrl)
+def mediactrl(element, parent):
+    return update(element, wx.media.MediaCtrl(parent,
+                                              style=wx.SIMPLE_BORDER))
+
+@update.register(wx.media.MediaCtrl)
+def mediactrl(element, instance: wx.media.MediaCtrl):
+    # TODO: fixme
+    props = element['props']
+    instance.SetMinSize((300,300))
+    # set_basic_props(instance, props)
+    if 'on_load' in props:
+        instance.Bind(wx.media.EVT_MEDIA_LOADED, props['on_load'])
+    # if
+    # if props.get('start'):
+    #     instance.Stop()
+    # else:
+    #     instance.Stop()
+    return instance
+
+
+
+@mount.register(SVG)
+def svg(element, parent):
+    return update(element, SVG(parent))
+
+@update.register(SVG)
+def svg(element, instance: SVG) -> SVG:
+    props = element['props']
+    set_basic_props(instance, props)
+    if props.get('uri'):
+        if getattr(instance, '_rewx_uri', None) != props.get('uri') \
+                or tuple(instance.GetBitmap().GetSize()) != props.get('size'):
+            svg = wx.svg.SVGimage.CreateFromFile(element['props']['uri'])
+            size = wx.Size(*props.get('size', (svg.width, svg.height)))
+            bitmap = svg.ConvertToScaledBitmap(size)
+            instance.SetBitmap(bitmap)
+            instance._rewx_uri = props['uri']
+            return instance
+        else:
+            # everything is samezies
+            return instance
+    else:
+        # URI isn't present, so we replace the current bitmap (if
+        # any) with a blank one
+        instance.SetBitmap(wx.Bitmap)
+        return instance
+
+
+@mount.register(SVGButton)
+def svgbutton(element, parent):
+    return update(element, SVGButton(parent))
+
+@update.register(SVGButton)
+def svgbutton(element, instance: SVGButton) -> SVGButton:
+    props = element['props']
+    set_basic_props(instance, props)
+
+    instance.Unbind(wx.EVT_BUTTON)
+    if props.get('on_click'):
+        instance.Bind(wx.EVT_BUTTON, props['on_click'])
+
+    set_basic_props(instance, props)
+    if props.get('uri'):
+        if getattr(instance, '_rewx_uri', None) != props.get('uri') \
+                or tuple(instance.GetBitmap().GetSize()) != props.get('size'):
+            svg = wx.svg.SVGimage.CreateFromFile(element['props']['uri'])
+            size = wx.Size(*props.get('size', (svg.width, svg.height)))
+            bitmap = svg.ConvertToScaledBitmap(size)
+            instance.SetBitmap(bitmap)
+            instance._rewx_uri = props['uri']
+            return instance
+        else:
+            # everything is samezies
+            return instance
+    else:
+        # URI isn't present, so we replace the current bitmap (if
+        # any) with a blank one
+        instance.SetBitmap(wx.Bitmap)
+        return instance
+
+
+
 @mount.register(wx.RadioBox)
 def radiobox(element, parent):
     return update(element, wx.RadioBox(parent))
@@ -435,10 +545,14 @@ def textctrl(element, parent):
 
 @update.register(wx.TextCtrl)
 def textctrl(element, instance: wx.TextCtrl):
-    props = element['props']
+    props = {**element['props']}
+    value = props.get('value')
+    del props['value']
     set_basic_props(instance, props)
     if 'editable' in props:
         instance.SetEditable(props['editable'])
+    if value is not None:
+        instance.ChangeValue(value)
     instance.Unbind(wx.EVT_TEXT)
     if 'on_change' in props:
         instance.Bind(wx.EVT_TEXT, props['on_change'])

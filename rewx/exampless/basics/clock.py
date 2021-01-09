@@ -6,7 +6,7 @@ import datetime
 import wx
 
 from rewx.app import basicapp
-from rewx import wsx, create_element, Component
+from rewx import wsx, create_element, Component, render
 from rewx import components as c
 
 
@@ -63,6 +63,9 @@ class Clock(Component):
 
 
 if __name__ == '__main__':
-    basicapp(create_element(Clock, {}), title='Clock')
-
+    app = wx.App()
+    frame = wx.Frame(None, title='Clock')
+    clock = render(create_element(Clock, {}), frame)
+    frame.Show()
+    app.MainLoop()
 

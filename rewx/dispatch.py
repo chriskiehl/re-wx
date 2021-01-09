@@ -24,7 +24,7 @@ def dispatch(func):
     def wrapper(element, parent: wx.Window):
         try:
             return registry[element['type']](element, parent)
-        except KeyError:
+        except KeyError as e:
             return registry['default'](element, parent)
 
     registry[object] = func

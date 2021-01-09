@@ -16,12 +16,12 @@ import os
 
 import time
 
-from app import basicapp
-from rewx.rewx2 import Component, wsx, create_element, render, Ref
+from rewx.app import basicapp
+from rewx import Component, wsx, create_element, render, Ref
 from rewx import components as c
-from util import extend, veq
+from rewx.util import extend, veq
 
-
+image_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'images')
 
 def fake_download(item):
     duration = randint(3,7)
@@ -167,9 +167,9 @@ class YoutubeDownloader(Component):
         return self.state.status == 'DOWNLOADING'
 
     def run_icon(self):
-        return './images/cloud_download_32px.png' \
+        return os.path.join(image_dir, 'cloud_download_32px.png') \
             if self.state.status == 'READY' \
-            else './images/stop_32px.png'
+            else os.path.join(image_dir, 'stop_32px.png')
 
 
     def foo(self, event):
@@ -256,4 +256,5 @@ def align_center(props):
 
 
 if __name__ == '__main__':
-    basicapp(create_element(YoutubeDownloader, {}), title='Youtube-DL clone')
+    basicapp(create_element(YoutubeDownloader, {}),
+             title='A download helper')
