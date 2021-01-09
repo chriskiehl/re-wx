@@ -41,7 +41,7 @@ pip install rewx
 <h2 align="center">RE-WX in Action!</h2>
 
 
-**A tiny Hello World:**
+### A tiny Hello World
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=right >
 You can assemble applications with re-wx using the humble function. This takes data and returns data. re-wx handles all the lifting required to build the WX instances. 
@@ -106,7 +106,9 @@ class Clock(Component):
 
 
 
-## The required TODO application
+### An Application
+
+<img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/todo-app.png" align=right >
 
 ```python 
 def TodoList(props):
