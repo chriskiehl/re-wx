@@ -16,7 +16,22 @@ re-wx is a library for building modern declarative desktop applications. It's bu
 
 It's inspired by React and brings ideas like the virtualdom, composable UI components, and declarative programming to the old crusty world of native UI kits. Built on WxPython, re-wx lets you create performant, cross platform, and _natively rendered_ applications with ease.
 
-### At a glance
+## What is it? 
+
+It's a "virtualdom" for WX. Decouple yourself from low-level WX code. You tell re-wx what you want to happen, and it'll do all the heavy lifting required to get WX to comply. It lets you focus on your state and transitions leaving implentation details of WX's ancient API to re-wx.  
+
+A new way of declaratively expressing UI layouts. 
+
+**Say goodbye to** 
+
+* Fighting auto-generated thin Python wrappers on old bloated C++ classes 
+* Deep coupling of business logic to stateful widgets
+* Trying to express UIs through low level `A.addChild(B)` plumbing code 
+
+
+
+
+
 
 
 
@@ -90,11 +105,7 @@ Decouple yourself from the low-level details.
 
 
 
-**Say goodbye to** 
 
-* Auto-generated thin Python wrappers on old bloated C++ classes 
-* Deep coupling of business logic to stateful widgets
-* Trying to express UIs through low level `A.addChild(B)` plumbing code 
 
 
 
@@ -117,7 +128,7 @@ class FormControls(wx.Panel):
 ## with RE-WX 
 
 ```python
-def my_component(props): 
+def form_controls(props): 
    return wsx(
      [Block, {'orient': wx.VERTICAL}, 
        [Block, {'orient': wx.HORIZONTAL}, 
@@ -243,6 +254,52 @@ class Clock(Component):
                            'border': 60}]]
         )
 ```
+
+
+
+## The required TODO application
+
+```python 
+def TodoList(props):
+    return create_element(c.Block, {}, children=[
+        create_element(c.StaticText, {'label': f" * {item}"})
+        for item in props['items']
+    ])
+
+
+class TodoApp(Component):
+    def __init__(self, props):
+        super().__init__(props)
+        self.state = {'items': ['Groceries', 'Laundry'], 'text': ''}
+
+    def handle_change(self, event):
+        self.set_state({**self.state, 'text': event.String})
+
+    def handle_submit(self, event):
+        self.set_state({
+            'text': '',
+            'items': [*self.state['items'], self.state['text']]
+        })
+
+    def render(self):
+        return wsx(
+            [c.Frame, {'title': 'My First TODO app'},
+             [c.Block, {'name': 'main-content'},
+              [c.StaticText, {'label': 'What needs to be done?'}],
+              [c.TextCtrl, {'value': self.state['text']}],
+              [c.Button, {'label': 'Add', 'on_click': self.handle_submit}],
+              [c.StaticText, {'label': 'TO DO:'}],
+              [TodoList, {'items': self.state['items'], 'on_click': self.handle_complete}]]]
+        )
+
+if __name__ == '__main__':
+    app = wx.App()
+    frame = render(create_element(TodoApp, {}), None)
+    frame.Show()
+    app.MainLoop()
+```
+
+
 
 ## Philosophy
 
