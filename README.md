@@ -2,18 +2,32 @@
   <img src="https://github.com/chriskiehl/re-wx-images/raw/images/logo/rewx.png"> 
 </p>
 
-A Python library for building modern declarative desktop applications in WX
+<p align="center">A Python library for building modern declarative desktop applications</p>
 
 <hr/>
-
 ![PyPI](https://img.shields.io/pypi/v/gooey)
 
 
 # Overview
 
-re-wx is a library for building modern declarative desktop applications. It's inspired by React and brings ideas like the virtualdom, composable UI components, and declarative programming to the old crusty world of native UI kits. Built on WxPython, re-wx lets you create performant, cross platform, and _natively rendered_ applications with ease.
+re-wx is a library for building modern declarative desktop applications. It's built as a management layer on top of WXPython, which means you get all the goodness of a mature, native, cross-platform UI kit, wrapped up in a modern, React inspired API. 
 
 
+It's inspired by React and brings ideas like the virtualdom, composable UI components, and declarative programming to the old crusty world of native UI kits. Built on WxPython, re-wx lets you create performant, cross platform, and _natively rendered_ applications with ease.
+
+### At a glance
+
+
+
+
+
+## Installation 
+
+```
+pip install rewx 
+```
+
+## quick start 
 
 
 ## Why WX?
@@ -231,9 +245,9 @@ class Clock(Component):
 
 ## Philosophy
 
-re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native UIs in WX easier. As such, it doesn't need reconcilers, or generic transactions, or any of the React bloat. re-wx entire codebase is just a handful of files < 1k lines of code, and could be understood in an afternoon.  
+re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native UIs in WX easier. As such, it doesn't need reconcilers, or generic transactions, or any of the React bloat. re-wx entire codebase is just a handful of files < 1k lines of code, and could probably be understood in an afternoon.  
 
-Practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which allows writing straight forward in-line Dialog code.  
+As such, practicality is favored over purity of abstraction. Meaning, you'll mix-match WXPython code + re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which allows writing straight forward in-line Dialog code.  
 
 ```python
 def handle_choose_dir(self, event): 
