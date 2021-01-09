@@ -23,6 +23,12 @@ It's a "virtualdom" for WX. You tell re-wx what you want to happen, and it'll do
 * Awkward auto-generated Python wrappers on old bloated C++ classes 
 * Being forced to express UIs through low level `A.GetLayout().addChild(B)` style plumbing code 
 
+**re-wx is:**
+
+* Declarative
+* Component Based 
+* 100% compatible with all WXPython code bases
+
 Re-wx lets you build expressive, maintainable applications out of simple, testable, functions and components.
 
 ## Installation 
@@ -32,13 +38,14 @@ The latest stable version is available on PyPi.
 pip install rewx 
 ```
 
-## Documentation
+## Getting Started 
 
-* Tutorial: Intro to re-wx 
-* Main Concepts 
-* Advanced Concepts
-* Debugging 
-* Getting Help 
+* [Tutorial: Intro to re-wx](#TODO)
+* [Main Concepts ](#TODO)
+* [Advanced Concepts](#TODO)
+* [Components](#TODO)
+* [Debugging](#TODO) 
+* [Getting Help](#TODO) 
 
 
 ## Examples: 
