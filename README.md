@@ -31,6 +31,10 @@ It's a "virtualdom" for WX. You tell re-wx what you want to happen, and it'll do
 
 Re-wx lets you build expressive, maintainable applications out of simple, testable, functions and components.
 
+## Project status: 
+
+The project is currently in alpha. Expect some bugs and feature gaps! Cut an issue for any probelms, requests, or questions.
+
 ## Installation 
 
 The latest stable version is available on PyPi. 
