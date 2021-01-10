@@ -1,6 +1,5 @@
 # Supported WX Components 
 
-## How to use
 
 WX Widgets supported and managed by re-wx can all be found in the `rewx.components` module. 
 
