@@ -50,6 +50,31 @@ from rewx import components as c
 
 ## ActivityIndicator 
 
+<table width="100%"><tr><td>
+    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/activity-indicator.PNG">
+    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+</td></tr></table>
+
+Example: 
 ```
 create_element(c.ActivityIndicator, {...})
 ```
+
+Available Props: 
+
+| key | Type | Description | 
+|------|------|---------|
+|label| blah |
+|value| blah |
+|background_color| blah |
+|foreground_color| blah |
+|font| blah |
+|helptext| blah |
+|name| blah |
+|min_size| blah |
+|max_size| blah |
+|tooltip| blah |
+|show| blah |
+|enabled| blah |
+|style| blah |
