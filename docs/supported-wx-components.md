@@ -50,12 +50,9 @@ from rewx import components as c
 
 ## ActivityIndicator 
 
-<table width="100%"><tr><td>
-    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<p align="center">
     <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/activity-indicator.PNG">
-    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-</td></tr></table>
-
+</p>
 Example: 
 ```
 create_element(c.ActivityIndicator, {...})
