@@ -191,6 +191,13 @@ def button_example(props):
 |on_click | callable | Calls the supplied function when this element is click. | 
 
 
+
+
+
+
+
+
+
 <br/>
 
 ## BitmapButton 
@@ -652,7 +659,7 @@ An individual RadioButton. This should be used over [RadioBox ](#RadioBox) when 
 
 **Example:**
 
-```
+```python
 def example(props):
     return wsx(
       [c.StaticBox, {'label': 'My Radio options'},
@@ -682,6 +689,323 @@ def example(props):
 |proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+
+
+
+
+
+<br /> 
+
+## Slider
+
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/slider.PNG">
+</p>
+
+**Example:**
+
+```
+def example(props):
+    return wsx(
+      [Slider, {'value': 22, 
+                'min': 0,
+                'max': 100}],
+    )
+```
+
+
+| key | Type | Description | 
+|------|------|---------|
+|value| int | Current value/position of the slider | 
+|min | int | Minimum value available in the slider | 
+|max | int | Maximum value available in the slider | 
+|on_change| callable | This function is called when the slider changes position | 
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+<br /> 
+
+## SpinCtrl
+
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/spinctrl.PNG">
+</p>
+
+**Example:**
+
+```
+def example(props):
+    return wsx(
+      [SpinCtrl, {'value': 22, 
+                'min': 0,
+                'max': 100}],
+    )
+```
+
+
+| key | Type | Description | 
+|------|------|---------|
+|value| int | Current value of the spin control | 
+|min | int | Minimum value of the spin control | 
+|max | int | Maximum value of the spin control | 
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+
+<br /> 
+
+## SpinCtrlDouble
+
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/spinctrl-double.PNG">
+</p>
+
+**Example:**
+
+```
+def example(props):
+    return wsx(
+      [SpinCtrlDouble, {'value': 22, 
+                'min': 0,
+                'max': 100,
+                'digits': 20,
+                'increment': 0.02}],
+    )
+```
+
+
+| key | Type | Description | 
+|------|------|---------|
+|value| float | Current value of the spin control | 
+|min | float | Minimum value of the spin control | 
+|max | float | Maximum value of the spin control | 
+|digits | int | Sets the maximum precision of the spin control|
+|increment | float | Sets the increment amount used by the spin control | 
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+
+## StaticBitmap
+
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/staticbitmap.PNG">
+</p>
+
+
+Display a fixed image. 
+
+**Example:**
+
+```
+def button_example(props):
+    return create_element(StaticBitmap, {'uri': 'path/to/your/image.png'})
+```
+
+**Availble Props:**
+
+
+| key | Type | Description | 
+|------|------|---------|
+|uri| string | filepath to the image you want displayed. re-wx will handle loading it and turning it into a bitmap |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+
+## StaticBox
+
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/staticbox.PNG">
+</p>
+
+
+Wraps its children in a bordered box with a name. 
+
+**Example:**
+
+```python
+def example(props):
+    return wsx(
+      [c.StaticBox, {'label': 'My Radio options'},
+         [c.Block, {'flag': wx.TOP, 'border': 20},
+             [c.RadioButton, {'label': 'A', 'selected': False}],
+             [c.RadioButton, {'label': 'B', 'selected': True}],
+             [c.RadioButton, {'label': 'C', 'selected': False}],
+             [c.RadioButton, {'label': 'D', 'selected': False}]]]
+    )
+```
+
+
+**Availble Props:**
+
+
+| key | Type | Description | 
+|------|------|---------|
+|label | str | Text to display at the top of the box | 
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/>
+
+## StaticLine
+
+Displays a Horizontal or Vertical line. 
+
+> Usage Note: make sure to set appropriate `proportion` and `flag` props to ensure that the line actually grows to fill the space you expect. If you're not seeing any lines when using this control, most of the time it's because your sizer isn't configured appropriately. Protip: Use the wx.Inspect tool! 
+
+**Example:**
+
+```python
+def example(props):
+    return wsx(
+      [c.StaticLine, {'style': wx.SL_HORIZONTAL, 'proportion': 1}]
+    )
+```
+
+
+**Availble Props:**
+
+
+| key | Type | Description | 
+|------|------|---------|
+|style | str | Text to display at the top of the box | 
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
