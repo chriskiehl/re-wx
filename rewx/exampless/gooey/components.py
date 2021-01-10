@@ -1,7 +1,6 @@
 import wx
-import rewx.virtualdom as v
+from rewx import components as c, create_element, wsx
 from exampless.gooey.gooey import Screens
-from rewx.rewx import readit22
 from itertools import zip_longest
 
 
@@ -120,11 +119,11 @@ def widget(props, *body):
 
 
 
-def when(props, *body):
+def when(props):
     if props['is_true']:
-        return v.block22({'xid': props['xid'],'proportion': 1, 'flag': wx.EXPAND}, *map(readit22, body))
+        return create_element(c.Block, {'proportion': 1, 'flag': wx.EXPAND}, children=props.get('children', []))
     else:
-        return v.block22({'xid': 'n', 'proportion': 0})
+        return c.Block({'xid': 'n', 'proportion': 0})
 
 
 def main_body(props, *body):
@@ -134,7 +133,7 @@ def main_body(props, *body):
         return readit22([v.textctrl, {'xid': '111', 'value': 'uhh'}])
 
 def config_page(props):
-    return readit22(
+    return wsx(
       [v.scrollblock, {'xid': 'confg', 'proportion': 1, 'flag': wx.EXPAND},
        [v.block22, {'xid': '12', 'proportion': 1, 'flag': wx.EXPAND | wx.ALL, 'border': 20},
         # Required args section

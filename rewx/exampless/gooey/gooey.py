@@ -11,10 +11,10 @@ from uuid import uuid4
 import rewx.virtualdom as v
 from pyrsistent import pmap, freeze, thaw
 
-from rewx.rewx import Ref
-from rewx.rewx import Component, readit22
+from rewx import Ref, wsx
+from rewx import Component, render
 from wx.lib.pubsub import pub
-from rewx.exampless.gooey import components as c
+from rewx import components as c
 from util import veq
 
 PROGRESS_CHAN = 'PROGRESS_MESSAGES'
@@ -152,14 +152,14 @@ class Gooey(Component):
         self.setState(self.state.set('screen', Screens.RESULTS).set('output', instance.GetValue()))
 
     def render(self):
-        return readit22(
-          [v.block22, {'xid': 'main', 'ref': self.panel_ref},
+        return wsx(
+          [c.Block, {'ref': self.panel_ref},
            [c.header, {'title': labels[self.state.screen]['title'],
                        'subtitle': labels[self.state.screen]['subtitle'],
                        'icon_uri': labels[self.state.screen]['icon_uri']}],
-           [v.line, {'xid': 'line', 'flag': wx.EXPAND}],
+           [c.StaticLine, {'flag': wx.EXPAND}],
 
-           [c.when, {'is_true': self.state.screen == Screens.CONFIG, 'xid': 'cf'},
+           [c.when, {'is_true': self.state.screen == Screens.CONFIG},
             [c.config_page, {'required': self.required(),
                              'optional': self.optional(),
                              'on_change': self.handle_input}],
