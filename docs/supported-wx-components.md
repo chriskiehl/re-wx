@@ -1,35 +1,40 @@
 # Supported WX Components 
 
 
-# Table of Contents: 
 
-* WX Primitives
-    * [ActivityIndicator](#ActivityIndicator)
-    * [Button](#Button)
-    * [BitmapButton](#BitmapButton)
-    * [CalendarCtrl](#CalendarCtrl)
-    * [CheckBox](#CheckBox)
-    * [CollapsiblePane](#CollapsiblePane)
-    * [ComboBox](#ComboBox)
-    * [Dropdown](#Dropdown)
-    * [Frame](#Frame)
-    * [Gauge](#Gauge)
-    * [ListBox](#ListBox)
-    * [ListCtrl](#ListCtrl)
-    * [Panel](#Panel)
-    * [RadioBox](#RadioBox)
-    * [RadioButton](#RadioButton)
-    * [Slider](#Slider)
-    * [SpinCtrl](#SpinCtrl)
-    * [SpinCtrlDouble](#SpinCtrlDouble)
-    * [StaticBitmap](#StaticBitmap)
-    * [StaticBox](#StaticBox)
-    * [StaticLine](#StaticLine)
-    * [StaticText](#StaticText)
-    * [TextCtrl](#TextCtrl)
-    * [ToggleButton](#ToggleButton)
-    * [MediaCtrl](#MediaCtrl)
-* Custom re-wx components 
+### Available Components: 
+
+ * [ActivityIndicator](#ActivityIndicator)
+ * [Block](#Block)
+ * [Button](#Button)
+ * [BitmapButton](#BitmapButton)
+ * [CalendarCtrl](#CalendarCtrl)
+ * [CheckBox](#CheckBox)
+ * [CollapsiblePane](#CollapsiblePane)
+ * [ComboBox](#ComboBox)
+ * [Dropdown](#Dropdown)
+ * [Frame](#Frame)
+ * [Gauge](#Gauge)
+ * [Grid](#Grid)
+ * [ListBox](#ListBox)
+ * [ListCtrl](#ListCtrl)
+ * [Panel](#Panel)
+ * [RadioBox](#RadioBox)
+ * [RadioButton](#RadioButton)
+ * [Slider](#Slider)
+ * [SpinCtrl](#SpinCtrl)
+ * [SpinCtrlDouble](#SpinCtrlDouble)
+ * [StaticBitmap](#StaticBitmap)
+ * [StaticBox](#StaticBox)
+ * [StaticLine](#StaticLine)
+ * [StaticText](#StaticText)
+ * [SVG](SVG)
+ * [SVGButton](SVGButton)
+ * [TextArea](#TextArea)
+ * [TextCtrl](#TextCtrl)
+ * [ToggleButton](#ToggleButton)
+ * [MediaCtrl](#MediaCtrl)
+
 
 
 ## How to use
