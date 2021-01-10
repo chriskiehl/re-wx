@@ -4,6 +4,7 @@ supported by rewx.
 """
 import wx
 import wx.adv
+import wx.lib.scrolledpanel
 import wx.media
 
 
@@ -22,6 +23,7 @@ ListCtrl = wx.ListCtrl
 Panel = wx.Panel
 RadioBox = wx.RadioBox
 RadioButton = wx.RadioButton
+ScrolledPanel = wx.lib.scrolledpanel.ScrolledPanel
 Slider = wx.Slider
 SpinCtrl = wx.SpinCtrl
 SpinCtrlDouble = wx.SpinCtrlDouble
@@ -32,6 +34,7 @@ StaticText = wx.StaticText
 TextCtrl = wx.TextCtrl
 ToggleButton = wx.ToggleButton
 MediaCtrl = wx.media.MediaCtrl
+
 
 class Grid(wx.Panel):
     """

@@ -1,10 +1,11 @@
+
 import wx
 import wx.adv
 import wx.media
 import wx.svg
 # TODO: warn on unknown props?
 import os
-
+from wx.lib.scrolledpanel import ScrolledPanel
 from rewx.dispatch import mount, update
 
 from rewx.components import Block, Grid, TextArea, SVG,SVGButton
@@ -34,6 +35,8 @@ basic_controls = {
     'enabled': 'Enable',
     'style': 'SetStyle',
 }
+
+
 
 
 
@@ -75,14 +78,14 @@ def frame(element, instance: wx.Frame):
 
 @mount.register(wx.ActivityIndicator)
 def activity_indicator(element, parent):
-    return wx.ActivityIndicator(parent)
+    return update(element, wx.ActivityIndicator(parent))
 
 @update.register(wx.ActivityIndicator)
 def activity_indicator(element, instance: wx.ActivityIndicator):
     props = element['props']
     set_basic_props(instance, props)
     if props.get('start'):
-        instance.Stop()
+        instance.Start()
     else:
         instance.Stop()
     return instance
@@ -141,7 +144,7 @@ def bitmapbutton(element, instance: wx.BitmapButton):
 
 @mount.register(wx.adv.CalendarCtrl)
 def calendarctrl(element, parent):
-    return wx.adv.CalendarCtrl(parent)
+    return update(element, wx.adv.CalendarCtrl(parent))
 
 
 @update.register(wx.adv.CalendarCtrl)
@@ -165,7 +168,7 @@ def calendarctrl(element, instance: wx.adv.CalendarCtrl) -> wx.Object:
 
 @mount.register(wx.CheckBox)
 def checkbox(element, parent):
-    return wx.CheckBox(parent)
+    return update(element, wx.CheckBox(parent))
 
 
 @update.register(wx.CheckBox)
@@ -177,10 +180,11 @@ def checkbox(element, instance: wx.CheckBox):
         instance.Bind(wx.EVT_CHECKBOX, props['on_change'])
     return instance
 
-
+# TODO: this requires special care
+# to handle children additions / removals
 @mount.register(wx.CollapsiblePane)
 def collapsiblepanel(element, parent):
-    return wx.CollapsiblePane(parent)
+    return update(element, wx.CollapsiblePane(parent))
 
 @update.register(wx.CollapsiblePane)
 def collapsiblepanel(element, instance: wx.CollapsiblePane):
@@ -214,7 +218,8 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
     for _ in instance.GetItems():
         instance.Delete(0)
     instance.AppendItems(props['choices'])
-    instance.SetSelection(props['choices'].index(element['props'].get('value')))
+    if 'value' in props:
+        instance.SetSelection(props['choices'].index(element['props'].get('value')))
 
     if props.get('on_change'):
         instance.Bind(wx.EVT_COMBOBOX, props['on_change'])
@@ -257,7 +262,8 @@ def listctrl(element, parent):
 @update.register(wx.ListCtrl)
 def listctrl(element, instance: wx.ListCtrl):
     props = {**element['props']}
-    del props['style']
+    if 'style' in props:
+        del props['style']
     set_basic_props(instance, props)
     # TODO: what events...?
     instance.DeleteAllColumns()
@@ -377,13 +383,17 @@ def radiobox(element, instance: wx.RadioBox):
 
 @mount.register(wx.StaticBox)
 def staticbox(element, parent):
-    return update(element, wx.StaticBox(parent))
+    instance = wx.StaticBox(parent)
+    sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
+    instance.SetSizer(sizer)
+    return update(element, instance)
 
 @update.register(wx.StaticBox)
 def staticbox(element, instance: wx.StaticBox):
     props = element['props']
     # TODO: does this auto-use a sizer..?
     set_basic_props(instance, props)
+
     return instance
 
 
@@ -518,6 +528,28 @@ def block(element, instance: Block):
 
 
 
+@mount.register(ScrolledPanel)
+def scrolledpanel(element, parent):
+    panel = update(element, ScrolledPanel(parent))
+    sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
+    panel.SetSizer(sizer)
+    return panel
+
+@update.register(ScrolledPanel)
+def scrolledpanel(element, instance: ScrolledPanel):
+    props = element['props']
+    set_basic_props(instance, props)
+    instance.SetupScrolling(
+        scroll_x=props.get('scroll_x', False),
+        scroll_y=props.get('scroll_y', False)
+    )
+    instance.Unbind(wx.EVT_LEFT_DOWN)
+    if 'on_click' in props:
+        instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
+    return instance
+
+
+
 @mount.register(Grid)
 def grid(element, parent):
     props = element['props']
@@ -547,7 +579,10 @@ def textctrl(element, parent):
 def textctrl(element, instance: wx.TextCtrl):
     props = {**element['props']}
     value = props.get('value')
-    del props['value']
+    try:
+        del props['value']
+    except KeyError:
+        pass
     set_basic_props(instance, props)
     if 'editable' in props:
         instance.SetEditable(props['editable'])
