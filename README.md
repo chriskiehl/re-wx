@@ -15,10 +15,10 @@
       <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG">
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/basic-video-player.PNG">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/kitchen-sink.png">
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/basic-video-player.PNG">
     </td>
     <td>
       <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG">
