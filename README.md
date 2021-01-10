@@ -51,9 +51,10 @@ It's a "virtualdom" for WX. You tell re-wx what you want to happen, and it'll do
 
 Re-wx lets you build expressive, maintainable applications out of simple, testable, functions and components.
 
-## Project status: 
+## Alpha Note: 
 
-The project is currently in alpha. Expect some bugs and feature gaps! Cut an issue for any probelms, requests, or questions.
+This is an early release. Expect some bugs, feature gaps, and a bit of API instability. 
+
 
 ## Installation 
 
@@ -67,7 +68,7 @@ pip install rewx
 * [Tutorial: Intro to re-wx](#TODO)
 * [Main Concepts ](#TODO)
 * [Advanced Concepts](#TODO)
-* [Components](#TODO)
+* [Supported Components](https://github.com/chriskiehl/re-wx/blob/main/docs/supported-wx-components.md)
 * [Debugging](#TODO) 
 * [Getting Help](#TODO) 
 
@@ -260,24 +261,6 @@ if __name__ == '__main__':
 
 
 
-## Examples: 
-
-Here are a few samples of the applications availble in the [Examples Repo](#TODO). Check it out and contribute your own re-wx application demos! 
-
-|  |  |  |  |  |
-|-------------|---------------|---------------|--------------|----------------|
-| <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/basic-video-player.PNG"> | <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG"> | 
-
-<h2 align="center">RE-WX in Action!</h2>
-
-
-
-
-
-
-
-
-
 ## Philosophy
 
 **It's a library first.**
@@ -313,8 +296,7 @@ Some WXPython widget, like the prefab RadioGroup, cannot have its number of opti
 
 ## Stuck? Need some help? Just have a question? 
 
-Open an issue [here]()
-Or feel free to hit me up at me@chriskiehl.com
+Open an issue [here](https://github.com/chriskiehl/re-wx/issues/new/choose), or feel free to hit me up directly at me@chriskiehl.com and we'll get it sorted out! 
 
 
 ## Contributing
