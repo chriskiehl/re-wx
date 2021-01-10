@@ -546,23 +546,27 @@ def listctrl_example(props):
 ## Panel
 
 
+A plain WX.Panel. For a version with an attached Sizer, checkout [Block](#Block). 
 
+Panel takes a backseat in re-wx to other types which have baked in Sizers and children management. In re-wx, panel is commonly used just as a spacer element when fine tuning layouts.  
 
 **Example:**
 
 ```
-def example(props):
-    return create_element(ComboBox, {
-        'selected': props['selected'],
-        'choices': ['one', 'two', 'three', 'four'],
-        'on_change': props['handle_change']})
+def panel_as_spacer(props):
+    return wsx(
+      [Block, {'orient': wx.HORIZONTAL},
+        # proportion 1 means grow to consume all of the available space 
+        # because this is in a Horizontal Block, it'll have the effect 
+        # of right aligning our button 
+        [Panel, {'proportion': 1}] 
+        [Button, {'label': 'A am right aligned thanks to the Panel'}]]
+    )
 ```
 
 
 | key | Type | Description | 
 |------|------|---------|
-|label| blah |
-|value| blah |
 |background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
 |foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
 |font| wx.Font | Sets the Font used by this component and all of its children|
@@ -585,6 +589,99 @@ def example(props):
 
 
 
+
+<br /> 
+
+## RadioBox
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/radiobox.PNG">
+</p>
+
+Usage note: Because of how manages `RadioBox`, its items can _not_ be modified after creation. So, changing `choices` will unfortunately have no effect. If you need the choices to be dynamically modifiable, checkout [RadioButton](#RadioButton)
+
+You _must_ define and handle `on_change` in order for the component to be controlled and honor your `selected` prop.
+
+**Example:**
+
+```
+def example(props):
+    return wsx(
+      [RadioBox, {
+        'selected': 2
+        'choices': ['A', 'B', 'C'],
+        'on_change': props['handle_change']
+        }]
+    )
+```
+
+
+| key | Type | Description | 
+|------|------|---------|
+| selected | int | the index of the selected option | 
+| choices | [str] | A list of string to be displayed as options | 
+|on_change | callable | This function is called when the user interacts with the radiobox|
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+
+
+
+
+
+<br /> 
+
+## RadioButton
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/radio-button.PNG">
+</p>
+
+An individual RadioButton. This should be used over [RadioBox ](#RadioBox) when you need fine-grained control over interactions and layout. 
+
+**Example:**
+
+```
+def example(props):
+    return wsx(
+      [c.StaticBox, {'label': 'My Radio options'},
+         [c.Block, {'flag': wx.TOP, 'border': 20},
+             [c.RadioButton, {'label': 'A', 'selected': False}],
+             [c.RadioButton, {'label': 'B', 'selected': True}],
+             [c.RadioButton, {'label': 'C', 'selected': False}],
+             [c.RadioButton, {'label': 'D', 'selected': False}]]]
+    )
+```
+
+
+| key | Type | Description | 
+|------|------|---------|
+| selected | int | the index of the selected option | 
+|on_change | callable | This function is called when the user interacts with the radiobox|
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
 
 
 
