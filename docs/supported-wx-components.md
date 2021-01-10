@@ -12,7 +12,7 @@
  * [CheckBox](#CheckBox)
  * [CollapsiblePane](#CollapsiblePane)
  * [ComboBox](#ComboBox)
- * [Dropdown](#Dropdown)
+ * [Dropdown](#ComboBox)
  * [Frame](#Frame)
  * [Gauge](#Gauge)
  * [Grid](#Grid)
@@ -326,13 +326,13 @@ def example(props):
 
 <br /> 
 
-## ComboBox / Dropdown
+## ComboBox
 
 <p align="center">
     <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/combobox.PNG">
 </p>
 
-
+Alias: Dropdown
 
 **Example:**
 
@@ -365,4 +365,226 @@ def example(props):
 |proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+
+<br /> 
+
+## Frame
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/frame.PNG">
+</p>
+
+This is the bedrock window to which all other components attach. There must be at least one of these in order for WX to bootstrap its GUI, and should must be at the root of your component tree. 
+
+**Example:**
+
+```
+def example(props):
+    return create_element(Frame, {'title': 'Hello world!'})
+```
+
+Note: The frame doesn't have to be created or managed by re-wx. Because re-wx outputs vanilla WX objects after `render`ing, you can attach them to an existing frame created elsewhere in the traditional WX manner. 
+
+```
+app = wx.App() 
+frame = wx.Frame(None, title='Hello world!') 
+my_panel = render(my_elements, frame)
+frame.Show()
+app.MainLoop()
+
+```
+
+
+**Availble Props:**
+
+| key | Type | Description | 
+|------|------|---------|
+|title| str | The text which displays in the program bar | 
+|show | boolean | Whether or not to show the Frame | 
+|icon_uri | str | File path to the icon to display in the program bar | 
+|style | int | See available styles in the [WXPython docs](https://www.wxpython.org/Phoenix/docs/html/wx.Frame.html) |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+
+
+
+
+
+
+<br /> 
+
+## Gauge
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/gauge.PNG">
+</p>
+
+
+**Example:**
+
+```
+def example(props):
+    return create_element(ComboBox, {
+        'selected': props['selected'],
+        'choices': ['one', 'two', 'three', 'four'],
+        'on_change': props['handle_change']})
+```
+
+**Availble Props:**
+
+| key | Type | Description | 
+|------|------|---------|
+|value| int | The the current value of the gauge  |
+|range| int | Sets the maximum value of the gauge |
+|pulse| boolean | when `True`, ignores `value` and `range` props and pulses on/off |
+|style | int | See available styles in the [WXPython docs](https://www.wxpython.org/Phoenix/docs/html/wx.Gauge.html) |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+
+
+
+
+
+
+
+
+
+<br /> 
+
+## ListCtrl
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/listctrl.PNG">
+</p>
+
+The `ListCtrl` in WX, while extremely powerful, has a super awkward and fiddly API. To tame this, re-wx only exposes a subset of the `ListCtrl`'s functionality and wraps it all up in a more declarative, straight forward API geared towards showing tables of information. However, if you need the full, unadultered power of `ListCtrl`, you can always use a `Ref` to grab a handle to the concrete wx instance. 
+
+
+**Example:**
+
+```
+some_data = [
+    {'name': 'Timmy',
+     'age': 12,
+     'occupation': 'Child'},
+    {'name': 'Buzz',
+     'age': 48,
+     'occupation': 'Astronaut'},
+    {'name': 'Cloud',
+     'age': 28,
+     'occupation': 'Avalanche'},
+    {'name': 'Spike',
+     'age': 27,
+     'occupation': 'Bounty Hunter'},
+]
+
+column_definitions = [
+    {'title': 'NAME', 'column': lambda item: item['name']},
+    {'title': 'AGE', 'column': lambda item: str(item['age'])},
+    {'title': 'NAME', 'column': lambda item: item['occupation']}
+]
+
+def listctrl_example(props):
+    return create_element(ListCtrl, {
+        'column_defs': column_definitions,
+        'data': some_data})
+```
+
+**Understanding the `column_defs` and `data` props**
+
+`data` is a list of any arbirary type. It could be a list of lists, list of maps, or any `List[A]`.  
+
+`column_defs` is how you define (a) what the columns of your table are, and (b) how the individual items in that column gets formatted. It's expressed as a list of maps, where each item in the list represents a column in your table. The `title` is used as the Column Header, and the `column` key should be a function (`A -> String`) which transforms an individual item from `data` into string form for display in the table. 
+
+**Availble Props:**
+
+| key | Type | Description | 
+|------|------|---------|
+|column_defs| [{title, column}] | A list of column definitions specifying your column header and row fomatting functions |
+|data| List[A] | A list of data to be displayed in the table |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+
+
+
+
+
+
+
+
+
+<br /> 
+
+## Panel
+
+
+
+
+**Example:**
+
+```
+def example(props):
+    return create_element(ComboBox, {
+        'selected': props['selected'],
+        'choices': ['one', 'two', 'three', 'four'],
+        'on_change': props['handle_change']})
+```
+
+
+| key | Type | Description | 
+|------|------|---------|
+|label| blah |
+|value| blah |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+
+
+
+
+
+
+
+
 
