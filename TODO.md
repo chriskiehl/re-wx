@@ -7,6 +7,7 @@
     * document that it works with exisitng projects. 'Progressive enhancement'
     * document departures from WX's API (for instance, ListCtrl's simplified interface)
         * document other API helpers, like block, bitmap button, etc.. 
+    * document layout philosophy and BoxSizer usage  
 * Examples: 
     * Youtube-DL 
     * Gooey 
