@@ -67,6 +67,7 @@ TEMPLATE
 |proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
 
 END TEMPLATE
 
@@ -104,15 +105,16 @@ def example(props):
 |proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. |
  
 
 
-
+<br/>
 ## Block
 
 Block is a wrapped version of `wx.Panel` which automatically adds children to an internal [`wx.BoxSizer()`](https://www.wxpython.org/Phoenix/docs/html/wx.BoxSizer.html). This is the bread and butter of layout control in re-wx. Think of it as a `div` in HTML. 
 
-Example: 
+**Example:** 
 
 ```python
 from components import Block, TextCtrl, Button
@@ -126,7 +128,7 @@ def example(props):
     )
 ```
 
-Available Props: 
+**Available Props:** 
 
 
 | key | Type | Description | 
@@ -144,12 +146,113 @@ Available Props:
 |proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. |
+
+
+<br/>
+## Button 
+
+Your basic button. 
+
+**Example:**
+
+```
+def button_example(props):
+    return create_element(Button, {'label': 'Click me!', 'on_click': props['handler']})
+```
+
+**Availble Props:**
+
+
+| key | Type | Description | 
+|------|------|---------|
+|label| string | The label displayed on the button |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
+
+
+<br/>
+## BitmapButton 
+
+BitmapButton is a button which uses an image rather than a text label. Use the `uri` prop to specify the image you want displayed. 
+
+**Example:**
+
+```
+def button_example(props):
+    return create_element(BitmapButton, {
+        'uri': 'path/to/your/image.png', 
+        'on_click': props['handler']})
+```
+
+**Availble Props:**
+
+
+| key | Type | Description | 
+|------|------|---------|
+|uri| string | filepath to the image you want displayed. re-wx will handle loading it and turning it into a bitmap |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
 
 
 
+<br/>
+## CalendarCtrl 
+
+BitmapButton is a button which uses an image rather than a text label. 
+
+**Example:**
+
+```
+def button_example(props):
+    return create_element(BitmapButton, {
+        'uri': 'path/to/your/image.png', 
+        'on_click': props['handler']})
+```
+
+**Availble Props:**
 
 
-
-
-
+| key | Type | Description | 
+|------|------|---------|
+|selected_date| datetime | sets the value of the date selected in the  widget |
+|display_holidays | boolean | toggles whether or not to display holidays on the calendar|
+|allow_month_change | boolean | controls whether or not the calendar can change to different months | 
+|on_change| callable | Calls the supplied function when the user changes the selected date| 
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component | 
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. | 
 
