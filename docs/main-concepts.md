@@ -3,7 +3,7 @@
 * [Elements](#Elements)
 * [WSX](#WSX)
 * [Rendering](#Rendering)
-* [Starting the App](#starting-the-app)
+* [Running a re-wx App](#running-a-re-wx-app)
 * [Rendering](#Rendering)
 
 
@@ -124,7 +124,7 @@ There are three things you need to start any WxPyton application:
 2. A toplevel `wx.Frame`
 3. The `MainLoop`
 
-The wx.App instance must be created before anything else. This is just a quirk of WxPython. It uses the creation of the App to instantiate a lot of platform dependent things. 
+The wx.App instance must be created before anything else. This is just a quirk of WxPython. It uses the creation of the App to instantiate a lot of platform dependent things. So, it's just a bit of boilerplate we need to keep WX happy. 
 
 ```python
 import wx 
@@ -149,29 +149,31 @@ if __name__ == '__main__':
     frame = render(my_element, None) 
 ```
 
-
+The last step in the process is kicking off the app's `MainLoop`. This is what gives WXPython control of the main thread of execution which it uses to launch the GUI and display your Frame. 
 
 ```python
-from rewx import create_element
+import wx 
+from rewx import render, wsx
 from rewx.components import Frame, StaticText
 
-# app is required by WXPython. It has to be created before anything else. 
-app = wx.App()
-elements = wsx(
-  [Frame, {'title': 'My Cool Application', 'show': True},
-    [StaticText, {'label': 'Howdy, cool person!'}]]
-)
-# here's where we're turning our elements into 
-# a proper wx object by rendering them 
-frame: Frame = render(elements, None)
-# MainLoop is some mpre WXPython specifics. We'll 
-# walk through them below 
-app.MainLoop()
+if __name__ == '__main__':
+    app = wx.App()
+    my_element = wsx(
+      [Frame, {'title': 'My Cool Application', 'show': True},
+        [StaticText, {'label': 'Howdy, cool person!'}]]
+    )
+    frame = render(my_element, None) 
+    app.MainLoop()
 ```
 
+That's it! If you copy/paste the above into your editor, you'll be the proud owner of a Hello World application. 
 
 
-Components 
+## Components 
+
+Components are how you manage state in re-wx. They could be as simple as adding a counter to a text input, or act as the heart of your entire application. 
+
+
 
 
 
