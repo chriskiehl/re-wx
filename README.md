@@ -100,7 +100,6 @@ if __name__ == '__main__':
         create_element(StaticText, {'label': 'Howdy, cool person!'})
     ])
     frame = render(element, None)
-    frame.Show()
     app.MainLoop()
 ```
 
@@ -270,6 +269,9 @@ if __name__ == '__main__':
     app.MainLoop()
 ```
 
+### Where to go from here? 
+
+Checkout the docs folder for more detailed guides and walk throughs
 
 
 
