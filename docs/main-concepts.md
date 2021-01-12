@@ -1,7 +1,9 @@
 # Main Concepts
 
 * [Elements](#Elements)
+* [WSX](#WSX)
 * [Rendering](#Rendering)
+* [Starting the App](#starting-the-app)
 * [Rendering](#Rendering)
 
 
@@ -99,7 +101,7 @@ If the root type in your re-wx element is a `Frame`, they you pass `None` to `pa
 Option 1: rendering a top-level frame
 ```python
 elements = create_element(Frame, {'title': 'Render demo'})
-render(elements, None)
+my_wx_instance = render(elements, None)
 ```
 
 Option 2: rendering onto an already existing wx.Object
@@ -108,7 +110,43 @@ Option 2: rendering onto an already existing wx.Object
 frame = wx.Frame(None) 
 elements = create_element(StaticText, {'label': 'Example'})
 # everything in `elements` will be rooted under `frame` 
-my_instance = render(elements, frame)
+my_wx_instance = render(elements, frame)
+```
+
+the output of the render is a wx.Object which matches the `type` specified at the root of your element tree. Meaning, even though you've specified your application as plain data, after rendering, you've got a fully ready-to-go instance of a WX object. This can be used just like any other WX object, because it _is_ a WX object. It's because of this that re-wx is 100% compatible with existing WXPython codebases! 
+
+
+## Running the App
+
+There are three things you need to start any WxPyton application:
+
+1. A `wx.App` instance
+2. A toplevel `wx.Frame`
+3. The `MainLoop`
+
+The wx.App instance must be created before anything else. This is just a quirk of WxPython. It uses the creation of the App to instantiate a lot of platform dependent things. 
+
+```python
+import wx 
+
+if __name__ == '__main__':
+    app = wx.App()
+```
+
+Next you'll need a top-level `Frame`. They're a special type in WX and what we generally associate with the main window when we're using an application. This can either come from re-wx as part of rendering your elements, or can optionally be created separately if you're integrating with existing code. 
+
+```python
+import wx 
+from rewx import render, wsx
+from rewx.components import Frame, StaticText
+
+if __name__ == '__main__':
+    app = wx.App()
+    my_element = wsx(
+      [Frame, {'title': 'My Cool Application', 'show': True},
+        [StaticText, {'label': 'Howdy, cool person!'}]]
+    )
+    frame = render(my_element, None) 
 ```
 
 
@@ -119,9 +157,10 @@ from rewx.components import Frame, StaticText
 
 # app is required by WXPython. It has to be created before anything else. 
 app = wx.App()
-elements = create_element(Frame, {'title': 'My Cool Application', 'show': True}, children=[
-  create_element(StaticText, {'label': 'Howdy, cool person!'})
-])
+elements = wsx(
+  [Frame, {'title': 'My Cool Application', 'show': True},
+    [StaticText, {'label': 'Howdy, cool person!'}]]
+)
 # here's where we're turning our elements into 
 # a proper wx object by rendering them 
 frame: Frame = render(elements, None)
