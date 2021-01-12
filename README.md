@@ -112,13 +112,29 @@ Here we've created two elements. A top-level `Frame` type, which is required by 
 
 Elements all consist of three pieces of data: 1. the `type` of the entity we want to render into the UI, 3. the properties ("props" from here on out) we want that entity to have, and 3. any children, which are themselves Elements. 
 
-An important note is that Elements are _plain data_ -- literally just a Python map. Together, they make up the "virtualdom" used by re-wx uses to drive the underlying WXWidgets components. Creating an element _does not_ instantiate any WX elements. That job falls to `render` 
+An important note is that Elements are _plain data_ -- literally just a Python map like this: 
 
-`rewx.render` is how we transform our tree of Elements into a live UI. It handles all of the lifting required to instantiate the WX Objects, associate them all together, and put them in the state specified by your tree. The output of `render` is a WX Object, which in our case, is our top level frame. 
+```python
+{
+  'type': Frame, 
+  'props': {
+      'title': 'My Cool Application', 
+      'show': True
+      'children': [{
+        'type': StaticText,
+        'props': {'label': 'Howdy, cool person!'}
+      }]
+  }
+
+
+
+Together, these elements make up the "virtualdom" used by re-wx uses to drive the underlying WXWidgets components. Creating an element _does not_ instantiate any WX elements. That job falls to `render` 
+
+`rewx.render` is how we transform our tree of Elements into a live UI. It handles all of the lifting required to instantiate the WX Objects, associate them all together, and put them in the state specified by your tree. The output of `render` is a WX Object, which in our example, is our top level frame. 
 
 With the frame now happily created, we just have to tell WXPython to start its main loop, which will launch the GUI, and we've officially built our first re-wx app! 
 
-### A brief detour for WSX:
+#### A brief detour for WSX:
 
 Writing all those `create_element` statements can get really tedious and creates a lot of visual noise which can make getting a feel for your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
 
@@ -134,12 +150,12 @@ element = wsx(
 For the rest of this guide, we'll be using the `wsx` form, but you can use `create_element` if you prefer. 
 
 
-<br/><br/>
+<br/>
 ### A Stateful component 
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
 
-Components allow you to store and manage state. 
+Components are how you store and manage state in re-wx. 
 
 ```python
 class Clock(Component):
@@ -178,11 +194,11 @@ if __name__ == '__main__':
     app.MainLoop()        
 ```
 
-Here we've setup a Component which keeps track of the current time and displays that time nice and bold in the center of our frame. 
+Here we've setup a Component which keeps track of the current time and displays it nice and bold in the center of our frame. 
 
 There's lot going on here, so we'll take if from the top! 
 
-You define your own components by inheriting from `rewx.Component`. This gives you access to all the lifecycle and state management options provided by the base class. 
+You define your own components by inheriting from `rewx.Component`. This gives you access to all the lifecycle and state management options provided by the base class. You can checkout the [Main Concepts](https://github.com/chriskiehl/re-wx/blob/main/docs/main-concepts.md) for the full details of the life cycle methods.
 
 Components have a few notable methods: 
 
@@ -208,10 +224,7 @@ if __name__ == '__main__':
     app.MainLoop()  
 ```    
    
-
-
-
-<br/><br/>
+<br/>
 ### An Application
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/todo-app.png" align=right >
