@@ -1,5 +1,10 @@
 # Main Concepts
 
+* [Elements](#Elements)
+* [Rendering](#Rendering)
+* [Rendering](#Rendering)
+
+
 ### Knowledge Level Assumptions 
 
 re-wx is designed to work in concert with WXPython, not abstract it away entirely. However, for this guide, no WXPython knowledge is required. We'll walk you through the few pieces you need to know as they come up. 
@@ -87,18 +92,24 @@ Render takes two arguments: The **Element** tree you want turned into UI widgets
 render(create_element(Frame, {'title': 'Render demo'}), None)
 ```
 
-Parent is any `wx.Object` **_or_** `None` if the top-level type in your Element tree is a `Frame`. 
+Parent is any `wx.Object` **_or_** `None` if the top-level type in your Element tree is a `Frame`. Understanding **Parent** means understanding a bit of WXPython proper, but practically speaking, there are just two rules: 
 
+If the root type in your re-wx element is a `Frame`, they you pass `None` to `parent`, otherwise, pass whichever `wx.Object` you'd like your elements to be rooted under. 
 
+Option 1: rendering a top-level frame
+```python
+elements = create_element(Frame, {'title': 'Render demo'})
+render(elements, None)
+```
 
+Option 2: rendering onto an already existing wx.Object
 
-
-Understanding **Parent** means understanding just a bit more about WXPython, so we'll take a breif detour here. 
-
-> If you're already familiar with WX, feel free to skip this next minor section 
-
-A `Frame` is a special type of `Window` in WX.  
-
+```python
+frame = wx.Frame(None) 
+elements = create_element(StaticText, {'label': 'Example'})
+# everything in `elements` will be rooted under `frame` 
+my_instance = render(elements, frame)
+```
 
 
 
@@ -119,19 +130,9 @@ frame: Frame = render(elements, None)
 app.MainLoop()
 ```
 
-We've picked up 
-
-a brief detour for some WXPython concepts. 
-
-Parent 
-
-
-
-
 
 
 Components 
 
 
-Rendering 
 
