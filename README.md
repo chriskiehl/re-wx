@@ -124,7 +124,7 @@ An important note is that Elements are _plain data_ -- literally just a Python m
         'props': {'label': 'Howdy, cool person!'}
       }]
   }
-
+```
 
 
 Together, these elements make up the "virtualdom" used by re-wx uses to drive the underlying WXWidgets components. Creating an element _does not_ instantiate any WX elements. That job falls to `render` 
