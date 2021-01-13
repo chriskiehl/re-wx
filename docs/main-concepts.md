@@ -116,6 +116,66 @@ my_wx_instance = render(elements, frame)
 the output of the render is a wx.Object which matches the `type` specified at the root of your element tree. Meaning, even though you've specified your application as plain data, after rendering, you've got a fully ready-to-go instance of a WX object. This can be used just like any other WX object, because it _is_ a WX object. It's because of this that re-wx is 100% compatible with existing WXPython codebases! 
 
 
+## Creating reusable Elements
+
+The humble function will be your main tool for managing reusability and clarity throughout your application. You can wrap up a group of related elements in a function and then use that function _just like you would any other Element_. 
+
+```python 
+# this is a plain ol' function that takes props 
+# and returns an Element
+def ConfigLine(props): 
+    return wsx(
+        [Block, {'orient': wx.HORIZONTAL},
+          [TextCtrl, {...}],
+          [Button, {...}]]
+    )
+```
+
+```python
+def control_panel(props): 
+   return wsx(
+       [Block, {'orient': wx.VERTICAL}, 
+         [StaticText, {'label': 'Config Options'}],
+         
+         [ConfigLine, {some_props_here}],
+         [ConfigLine, {some_props_here}],
+         [ConfigLine, {some_props_here}]]
+   )
+```
+
+
+
+## Components 
+
+Components are how you create independent, reusable, stateful entities in re-wx. 
+
+Components are just like Elements. Meaning, they have a `type` and take `props`. However, they have a few additional super powers.  
+
+, but they have a few additional super powers. They act as independent, reusable pieces of UI code, and one additional super power: they store and manage state across renders. 
+
+
+You create components by declaring a class that inherits from `rewx.Component`. 
+
+```python 
+from rewx import Component 
+from rewx.components import Frame, StaticText 
+
+class MyComponent(Component):
+   def render(props): 
+       return wsx(
+           [Block, {}, 
+             [StaticText, {'label': 'Hello Components!'}]]
+       )
+```
+
+**Component philosophy:** 
+
+Fewer are preferable to many. State is the hardest thing to manage in programming. 
+
+
+Components are how you manage state in re-wx. They could be as simple as adding a counter to a text input, or act as the heart of your entire application. 
+
+
 ## Running the App
 
 There are three things you need to start any WxPyton application:
@@ -167,13 +227,5 @@ if __name__ == '__main__':
 ```
 
 That's it! If you copy/paste the above into your editor, you'll be the proud owner of a Hello World application. 
-
-
-## Components 
-
-Components are how you manage state in re-wx. They could be as simple as adding a counter to a text input, or act as the heart of your entire application. 
-
-
-
 
 
