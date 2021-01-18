@@ -18,12 +18,14 @@ setuptools.setup(
     install_requires=['wxpython>=4.1.0'],
     packages=setuptools.find_packages(),
     classifiers=[
+        "Development Status :: 2 - Pre-Alpha",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
         "Intended Audience :: End Users/Desktop",
-        "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
-        "Topic :: Multimedia :: Graphics :: Capture"
+        "Topic :: Software Development :: User Interfaces"
     ],
     python_requires='>=3.6',
 )
