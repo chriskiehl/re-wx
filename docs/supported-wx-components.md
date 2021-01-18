@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">Supported WX Components </h1>
-
+<br/><br/>
 
 WX Widgets supported and managed by re-wx can all be found in the `rewx.components` module. 
 
