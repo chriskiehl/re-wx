@@ -69,8 +69,8 @@ pip install rewx
 * [Main Concepts ](https://github.com/chriskiehl/re-wx/blob/main/docs/main-concepts.md)
 * [Advanced Concepts](#TODO)
 * [Supported Components](https://github.com/chriskiehl/re-wx/blob/main/docs/supported-wx-components.md)
-* [Debugging](#TODO) 
-* [Getting Help](#TODO) 
+* [Debugging](https://github.com/chriskiehl/re-wx/blob/main/docs/debugging.md) 
+* [Getting Help](#Stuck-Need-some-help-Just-have-a-question-) 
 
 
 ## Tutorial: RE-WX in 5 minutes
