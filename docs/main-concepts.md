@@ -281,7 +281,7 @@ Check it out! We can reference state in any of the methods we define in our clas
 
 So far so good, but our clock isn't much of a clock yet. It just sits there displaying whatver time it received on its first render. To fix this, we'll learn how to update state. 
 
-**Updating state: part I** 
+**Updating state:** 
 
 Your tool for updating Component state is the method `self.set_state()`. It takes the whatever the next state should be. Before we teach our clock to keep time on its own, let's introduce a button which will update the current time. This'll let us see `set_state` in action as well as a quick tour of event handling. 
 
@@ -316,7 +316,7 @@ Now, let's finish making this clock a proper clock. We want to start the clock a
 
 Very often, you'll want to take some action when a component is added to the GUI. In re-wx, we call this event _mounting_, and Component has a special hook method for this event called `component_did_mount()`. You can override this method in your class to handle any one-time initialization actions that you want to take place in the UI. 
 
-It's important to understand the difference between the Component's _initialization_ and when the wx.Object is actually mounted onto a Window. What 
+It's important to understand the difference between the Component's _initialization_ and when the wx.Object is actually _mounted_ onto a Window. Initialization is what happens when your `__init__` method is called by re-wx. It is where you setup your state and any instance variables you may want. The key thing here is that _no WX widgets have been created at the time of initialization_. So, for instance, if you tried to access any part of the wx.Window, you'd get an undefined error. 
 
 
 
