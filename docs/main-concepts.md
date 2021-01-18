@@ -147,14 +147,9 @@ def control_panel(props):
 
 ## Components 
 
-Components are how you create independent, reusable, stateful entities in re-wx. 
+Components let you create reusable bits of code just like functions, but they have one additional super power: the can store and manage state. 
 
-Components are just like Elements. Meaning, they have a `type` and take `props`. However, they have a few additional super powers.  
-
-, but they have a few additional super powers. They act as independent, reusable pieces of UI code, and one additional super power: they store and manage state across renders. 
-
-
-You create components by declaring a class that inherits from `rewx.Component`. 
+You create components by declaring a class that inherits from `rewx.Component`. The most basic Component just includes a `render` method. 
 
 ```python 
 from rewx import Component 
@@ -164,16 +159,136 @@ class MyComponent(Component):
    def render(props): 
        return wsx(
            [Block, {}, 
-             [StaticText, {'label': 'Hello Components!'}]]
+             [StaticText, {'label': f"Hello {props['name']!"}]]
        )
 ```
+
+You use them just like you would any other Type in re-wx, by turning them into an Element:
+
+```python
+create_element(MyComponent, {'name': 'My component'})
+```
+
+Because Components are turned into Elements like everything else, you can freely mix and match between re-wx provided components and your own custom ones to build larger units of functionality: 
+
+```python
+wsx(
+  [Block, {}, 
+    [MyComponent, {'name': 'My Component'}],
+    [StaticText, {'label': 'Howdy'}]]
+)
+```
+
+You can even use Components inside of other Components! 
+
+```python
+from rewx import Component, wsx, render, create_element
+from rewx.components import StaticText, Frame
+
+class ComponentA(Component):
+    def render(self):
+        return wsx([StaticText, {'label': self.props['message']}])
+
+class ComponentB(Component):
+    def render(self):
+        return wsx(
+          [Frame, {'title': 'Composin Components', 'show': True},
+            [ComponentA, {'message': 'I am rendered inside of Component B! Neat!'}]]
+```
+
+**Accessing Props**
+
+Just like all the things we've seen so far, Components are use `props` to do useful things. You access them from the component instance via `self.props`. 
+
+**Props are Immutable and Read-Only**
+
+Component `props` should never be updated directly by your code. Meaning, doing something like `self.props['my_value'] = 10` is an **error**. The Componet itself will handle updating the props in response to changes in the rest of the app. This means that all of your code should be pure functions which take data as input and return data as output. re-wx handles all the updating behind the scenes. 
+
+
+## Components, state, and lifecycle
+
+Components are how you manage state in re-wx. They could be as simple as something which keeps track of a counter or act as the central heart of your entire application. 
+
+To show how all this works, we're going to walk through creating a simple, reusable clock component. This Component will display the current time, updated each second, wherever we put it in our application. 
+
+You add state to a Component by overridding the Component's `__init__` method 
+
+```
+class Clock(Component): 
+    def __init__(self, props): 
+        super().__init__(props)  # don't forget this line!
+        self.state = {} # you're state here
+    
+    def render(self):
+        ...
+```
+
+>Note that the call to `super()` is _required_. Don't forget it! 
+
+Just like `props`, your `state` can contain anything you want. Any valid Python map will work! Since we're building a clock, we'll store the current time in our state. 
+
+```python
+from datetime import datetime
+
+class Clock(Component): 
+    def __init__(self, props): 
+        super().__init__(props) 
+        # New! our state now holds the current time 
+        self.state = {
+            current_time: datetime.now()
+        } 
+    
+    def render(self):
+        ...
+```
+
+Now that we've defined some state, we can reference it any of the methods we define on our class by accessing `self.state`. Let's now update the `render` function to show this on the screen. 
+
+
+```python
+class Clock(Component): 
+    def __init__(self, props): 
+        super().__init__(props) 
+        self.state = {
+            current_time: datetime.now()
+        } 
+    
+    # new!    
+    def render(self):
+        return wsx([StaticText, {'label': str(self.state['current_time'])}])
+```
+
+Just like `props` we can reference state directly in `render` in order to display it. However the default string formatting of Python's datetime object isn't very clock-like -- actually, it doesn't show any time info at all! Let's add a helper method to make the formatting more inline with what we expect. 
+
+
+
+```python
+class Clock(Component): 
+    def __init__(self, props): 
+        super().__init__(props) 
+        self.state = {
+            current_time: datetime.now()
+        } 
+    # new! 
+    def format_time(self): 
+        """Formats the datetime as the more clock-y hh:mm:ss"""
+        return self.state['current_time'].strftime('%I:%M:%S')
+        
+    def render(self):
+        # updated!
+        return wsx([StaticText, {'label': self.format_time()}])
+```
+
+Check it out! We can reference state in any of the methods we define in our class! Here we setup a little helper which reads the current state, and transforms it into something more presentable for display in the UI. We then used that helper in our `render` method. 
+
+
+
 
 **Component philosophy:** 
 
 Fewer are preferable to many. State is the hardest thing to manage in programming. 
 
 
-Components are how you manage state in re-wx. They could be as simple as adding a counter to a text input, or act as the heart of your entire application. 
 
 
 ## Running the App
