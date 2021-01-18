@@ -1,4 +1,9 @@
-# Main Concepts
+
+<p align="center">
+  <img src="https://github.com/chriskiehl/re-wx-images/raw/images/logo/icon-large.png" align=center >
+</p>
+
+<h1 align="center">Main Concepts</h1>
 
 * [Elements and Rendering](#Elements-and-rendering)
 * [WSX](#WSX)
