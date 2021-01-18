@@ -31,6 +31,12 @@ This'll launch the the Inspection Tool, which looks like this:
 
 All builtin re-wx componets take a prop called `name`. When supplied, it will tag the wx components with that name in the debugger. This makes it much easier to find specific blocks is a large application. 
 
+```python
+def render():
+    return wsx([StaticText, {'name': 'My Clock', ...}])
+```
+
+
 <p align="center">
   <img src="https://github.com/chriskiehl/re-wx-images/raw/images/docs/debugging/named-components.png" align=center >
 </p>
