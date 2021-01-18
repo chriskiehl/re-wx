@@ -65,15 +65,14 @@ pip install rewx
 
 ## Documentation 
 
-* [Tutorial: (here in the readme ^_^)](#Tutorial-RE-WX-in-5-minutes)
+* [Quick Start](#Quick-Start-RE-WX-in-5-minutes)
 * [Main Concepts ](https://github.com/chriskiehl/re-wx/blob/main/docs/main-concepts.md)
-* [Advanced Concepts](#TODO)
 * [Supported Components](https://github.com/chriskiehl/re-wx/blob/main/docs/supported-wx-components.md)
 * [Debugging](https://github.com/chriskiehl/re-wx/blob/main/docs/debugging.md) 
-* [Getting Help](#Stuck-Need-some-help-Just-have-a-question-) 
+* [Getting Help](#stuck-need-some-help-just-have-a-question) 
 
 
-## Tutorial: RE-WX in 5 minutes
+## Quick Start: RE-WX in 5 minutes
 
 re-wx has just a few core ideas: Elements, Components, and rendering. Everything else is achieved by combining these 3 ideas into larger and larger things. 
 3 things 
