@@ -3,7 +3,7 @@
 * [Elements and Rendering](#Elements-and-rendering)
 * [WSX](#WSX)
 * [Rendering](#Rendering)
-* [Creating reusable Elements](#Creating-reusable-Elements
+* [Creating reusable Elements](#Creating-reusable-Elements)
 * [Components](#Components)
 * [Component and State](#Component-and-state)
 * [Component lifecycle methods](#Component-lifecycle-methods)
