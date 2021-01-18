@@ -260,8 +260,6 @@ class Clock(Component):
 
 Just like `props` we can reference state directly in `render` in order to display it. However the default string formatting of Python's datetime object isn't very clock-like -- actually, it doesn't show any time info at all! Let's add a helper method to make the formatting more inline with what we expect. 
 
-
-
 ```python
 class Clock(Component): 
     def __init__(self, props): 
@@ -280,6 +278,46 @@ class Clock(Component):
 ```
 
 Check it out! We can reference state in any of the methods we define in our class! Here we setup a little helper which reads the current state, and transforms it into something more presentable for display in the UI. We then used that helper in our `render` method. 
+
+So far so good, but our clock isn't much of a clock yet. It just sits there displaying whatver time it received on its first render. To fix this, we'll learn how to update state. 
+
+**Updating state: part I** 
+
+Your tool for updating Component state is the method `self.set_state()`. It takes the whatever the next state should be. Before we teach our clock to keep time on its own, let's introduce a button which will update the current time. This'll let us see `set_state` in action as well as a quick tour of event handling. 
+
+> Important note: just like `props`, a component's `state` should be treated as an immutable, read-only value. It should _never_ be updated directly by modifying it it in place (e.g. `self.state['my_value'] = 'foo'`). re-wx is blind to these binds of mutations and will not know that it needs to re-render the changes. Always use `set_state` when you need to update your state!  
+
+
+```
+class Clock(Component): 
+    def __init__(self, props): 
+        super().__init__(props) 
+        self.state = {
+            current_time: datetime.now()
+        } 
+    ...
+    # new!
+    def update_time(self, event): 
+        self.set_state({'current_time': datetime.now()})
+    
+    def render(self):
+        return wsx(
+          # new!
+          [Block, {'orient': wx.HORIZONTAL},
+            [StaticText, {'label': self.format_time()}],
+            [Button, {'label': 'Update', 'on_click': self.update_time)
+```
+
+Here we added our button to `render` and set its `on_click` handler to a method we defined on our component called `update_time`. Now, whenever we click the button, `update_time` will get invoked, which calls `set_state` with the new state we're defining. re-wx is listening for these state changes and kicks off a `render` in response, thus causing our time display to be updated. This pattern is the core of how you'll build applications in re-wx. You only have to deal with declaring how things fit together and how state changes in response to event, and re-wx handles all the rest. 
+
+Now, let's finish making this clock a proper clock. We want to start the clock as soon as it's available in UI. To do that, we have to talk about Life Cycle Methods 
+
+## Component lifecycle methods
+
+
+
+
+
 
 
 
