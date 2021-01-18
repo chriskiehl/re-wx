@@ -75,9 +75,8 @@ pip install rewx
 ## Quick Start: RE-WX in 5 minutes
 
 re-wx has just a few core ideas: Elements, Components, and rendering. Everything else is achieved by combining these 3 ideas into larger and larger things. 
-3 things 
 
-A re-wx application consists of three steps. 
+All re-wx application consists of just a few steps. 
 
 1. define your application view
 2. Rendering  it to produce a wx object
@@ -126,7 +125,7 @@ An important note is that Elements are _plain data_ -- literally just a Python m
 ```
 
 
-Together, these elements make up the "virtualdom" used by re-wx uses to drive the underlying WXWidgets components. Creating an element _does not_ instantiate any WX elements. That job falls to `render` 
+Together, these elements make up the "virtualdom" used by re-wx uses to drive the underlying WXWidgets components. Creating an element _does not_ actually instantiate any WX elements. That job falls to `render` 
 
 `rewx.render` is how we transform our tree of Elements into a live UI. It handles all of the lifting required to instantiate the WX Objects, associate them all together, and put them in the state specified by your tree. The output of `render` is a WX Object, which in our example, is our top level frame. 
 
@@ -281,9 +280,9 @@ Checkout the docs folder for more detailed guides and walk throughs
 re-wx is "just" a library, _not_ a framework. Beacuse it's a library, you can use as much or as little of as you need. It requires no application-level total buy in like a framwork would. You don't have to do everything the "re-wx way. Further, the output from a re-wx `render` is a plain old WXPython component. Meaning, all re-wx components _ARE_ WX components, and thus require no special handling to integrate with your existing code base. 
 
 **It's intended to be symbiotic with WXPython** 
-re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native, cross-platform UIs in WXPython easier. As such, it doesn't need reconcilers, or generic transactions, or any other bloat. re-wx's entire codebase is just a handful of files < 1k lines of code, and could be understood in an afternoon.  
+re-wx is not trying to be an general purpose abstraction over multiple backend UI kits. It's lofty goals begin and end with it being a way of making writing native, cross-platform UIs in WXPython easier. As such, it doesn't need reconcilers, or generic transactions, or any other abstraction related bloat. As a result, re-wx's core codebase is just a handful of files and can be understood in an afternoon.  
 
-As such, practicality is favored over purity of abstraction. You'll mix and match WXPython code and re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which enables writing straight forward in-line Dialog code.  
+Given the symbiotic nature, practicality is favored over purity of abstraction. You'll mix and match WXPython code and re-wx code as needed. A good example of this is for transient dialogs (confirming actions, getting user selectsions, etc..). In React land, you'd traditionally have a modal in your core markup, and then conditionally toggle its visibility via state. However, in re-wx, you'll just use the dialog directly rather than embedding it in the markup and handling its lifecycle via `is_open` style state flags. This is practical to do because, unlike React in Javascript, WX handles managing the UI thread thus allowing us to block in place without any negative effects. Which enables writing straight forward in-line Dialog code.  
 
 ```python
 def handle_choose_dir(self, event): 
