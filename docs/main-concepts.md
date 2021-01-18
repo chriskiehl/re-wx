@@ -1,10 +1,14 @@
 # Main Concepts
 
-* [Elements](#Elements)
+* [Elements and Rendering](#Elements-and-rendering)
 * [WSX](#WSX)
 * [Rendering](#Rendering)
-* [Running a re-wx App](#running-a-re-wx-app)
-* [Rendering](#Rendering)
+* [Creating reusable Elements](#Creating-reusable-Elements
+* [Components](#Components)
+* [Component and State](#Component-and-state)
+* [Component lifecycle methods](#Component-lifecycle-methods)
+* [Running re-wx Applications](#Running-re-wx-Applications)
+
 
 
 ### Knowledge Level Assumptions 
@@ -14,29 +18,6 @@ re-wx is designed to work in concert with WXPython, not abstract it away entirel
 >If you want to learn more about WXPython, checkout these resources for great overviews
 >  * [official docs](https://docs.wxpython.org/Overviews.html)
 >  * [Mouse vs Python blog](http://www.blog.pythonlibrary.org/)
-
-
-## Hello World 
-
-<p align="center">
-  <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/hello-world.png" align=center >
-</p>
-
-```python
-import wx
-from rewx import create_element, wsx, render     
-from rewx.components import StaticText, Frame
-
-if __name__ == '__main__':
-    app = wx.App()    
-    element = create_element(Frame, {'title': 'My Cool Application', 'show': True}, children=[
-        create_element(StaticText, {'label': 'Howdy, cool person!'})
-    ])
-    frame = render(element, None)
-    app.MainLoop()
-```
-
-Run this and you'll see the output on the right. While not glamorous yet, it lets us explore several of the main ideas.
 
 
 ## Elements and Rendering 
@@ -78,6 +59,22 @@ Together, these elements make up the fancily titled "virtualdom," or, more like 
 The core thing to notice is that at no point do we have to deal with how these collections of Elements get transformed into GUI elements, or how their instances are managed, or any of the low-level details you generally have to deal with when using Desktop GUI frameworks. re-wx is all about creating applications using simple functions (and Componets, which we'll get to below) that take data as input and return data as output. 
 
 Now, the question is how we get from our collections of Elements, to a live bunch of UI widgets. That's where rendering comes in. 
+
+
+## WSX 
+
+Writing all those `create_element` statements can get really tedious and creates a lot of visual noise which can make getting a feel for your UI's structure at a glance difficult. An alternative and recommended approach is to use `wsx`, which lets you use nested lists to express parent child relationships between components. It uses the exact same `[type, props, *children]` arguments as `create_element`, but with a terser more compact syntax. Here's the same example using `wsx`. 
+
+```python 
+from rewx import wsx 
+...
+element = wsx(
+  [Frame, {'title': 'My Cool Application', 'show': True}, 
+    [StaticText, {'label': 'Howdy, cool person!'}]]
+)
+```
+
+For the rest of this guide, we'll be using the `wsx` form, but you can use `create_element` if you prefer. 
 
 
 ## Rendering 
@@ -205,7 +202,7 @@ Just like all the things we've seen so far, Components are use `props` to do use
 Component `props` should never be updated directly by your code. Meaning, doing something like `self.props['my_value'] = 10` is an **error**. The Componet itself will handle updating the props in response to changes in the rest of the app. This means that all of your code should be pure functions which take data as input and return data as output. re-wx handles all the updating behind the scenes. 
 
 
-## Components, state, and lifecycle
+## Components and state
 
 Components are how you manage state in re-wx. They could be as simple as something which keeps track of a counter or act as the central heart of your entire application. 
 
@@ -316,11 +313,9 @@ Now, let's finish making this clock a proper clock. We want to start the clock a
 
 Very often, you'll want to take some action when a component is added to the GUI. In re-wx, we call this event _mounting_, and Component has a special hook method for this event called `component_did_mount()`. You can override this method in your class to handle any one-time initialization actions that you want to take place in the UI. 
 
-It's important to understand the difference between the Component's _initialization_ and when the wx.Object is actually _mounted_ onto a Window. Initialization is what happens when your `__init__` method is called by re-wx. It is where you setup your state and any instance variables you may want. The key thing here is that _no WX widgets have been created at the time of initialization_. So, for instance, if you tried to access any part of the wx.Window, you'd get an undefined error. 
+It's important to understand the difference between the Component's _initialization_ and when the wx.Object is actually _mounted_ onto a Window. Initialization is what happens when your `__init__` method is called by re-wx. It is where you setup your state and any instance variables you may want. The key thing here is that _no WX widgets have been created at the time of initialization_. So, for instance, if you tried to access any part of the wx.Window or call `set_state`, you'd get an Exception thrown due the UI not yet being available. Conversey, _mounting_ is when all of the wx.Objects you've defined at actually attached to the `wx.Window`. This happens _after initialization_. It is at this point that the UI can be interacted with, [Ref](#Refs) are available, and everything is ready to rock. 
 
-
-
-Sticking with our Clock example, we want to start a `wx.Timer` and tie it to our update method so that the Clock actually keeps the current time automatically. Using `component_did_mount` is how we'll make that happen. 
+Sticking with our Clock example, we want to start a [`wx.Timer`](https://wxpython.org/Phoenix/docs/html/wx.Timer.html) and tie it to our update method so that the Clock actually keeps the current time automatically. Becuase we want these updates to be applied to the UI, we want to kick off this timer after _mounting_ not during _initialization_. As such, we'll define our timer inside of `component_did_mount`! 
 
 
 ```python 
@@ -332,7 +327,7 @@ class Clock(Component):
         self.state = {
             current_time: datetime.now()
         } 
-    
+    # new! 
     def component_did_mount():
         self.timer = wx.Timer()
         self.timer.Notify = self.update_time
@@ -349,18 +344,12 @@ class Clock(Component):
             [Button, {'label': 'Update', 'on_click': self.update_time)
 ```
 
+That's it! Now when the component gets mounted onto the wx Window, we'll kick off a timer which updates the clock's display every second. 
+
+At a high level, that's all there is to Components. With Elements, Functions, and Components under our belt, we've got all the tools we need to build advanced applications using re-wx! 
 
 
-
-
-**Component philosophy:** 
-
-As a general rule of thumb, fewer stateful components are preferable to many. State is the hardest thing to manage in programming. In re-wx, you should favor coarse 
-
-
-
-
-## Running the App
+## Running re-wx Applications
 
 There are three things you need to start any WxPyton application:
 
