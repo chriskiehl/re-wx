@@ -13,7 +13,7 @@ Writing massive applications leaves a lot of room for we failable humans to get 
 
 The tool is its own top-level Frame independent of yours, so you can create the InspectionTool anywhere as long as it's after the creation of `wx.App`. 
 
-```
+```python
 def main(): 
     app = wx.App()
     import wx.lib.inspection
