@@ -314,9 +314,40 @@ Now, let's finish making this clock a proper clock. We want to start the clock a
 
 ## Component lifecycle methods
 
+Very often, you'll want to take some action when a component is added to the GUI. In re-wx, we call this event _mounting_, and Component has a special hook method for this event called `component_did_mount()`. You can override this method in your class to handle any one-time initialization actions that you want to take place in the UI. 
+
+It's important to understand the difference between the Component's _initialization_ and when the wx.Object is actually mounted onto a Window. What 
 
 
 
+Sticking with our Clock example, we want to start a `wx.Timer` and tie it to our update method so that the Clock actually keeps the current time automatically. Using `component_did_mount` is how we'll make that happen. 
+
+
+```python 
+class Clock(Component): 
+    def __init__(self, props): 
+        super().__init__(props) 
+        # new! 
+        self.timer = None
+        self.state = {
+            current_time: datetime.now()
+        } 
+    
+    def component_did_mount():
+        self.timer = wx.Timer()
+        self.timer.Notify = self.update_time
+        self.timer.Start(milliseconds=1000)
+    
+    def update_time(self, event): 
+        self.set_state({'current_time': datetime.now()})
+    
+    def render(self):
+        return wsx(
+          # new!
+          [Block, {'orient': wx.HORIZONTAL},
+            [StaticText, {'label': self.format_time()}],
+            [Button, {'label': 'Update', 'on_click': self.update_time)
+```
 
 
 
@@ -324,7 +355,7 @@ Now, let's finish making this clock a proper clock. We want to start the clock a
 
 **Component philosophy:** 
 
-Fewer are preferable to many. State is the hardest thing to manage in programming. 
+As a general rule of thumb, fewer stateful components are preferable to many. State is the hardest thing to manage in programming. In re-wx, you should favor coarse 
 
 
 
