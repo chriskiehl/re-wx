@@ -1,4 +1,8 @@
-# Supported WX Components 
+<p align="center">
+  <img src="https://github.com/chriskiehl/re-wx-images/raw/images/logo/icon-large.png" align=center >
+</p>
+
+<h1 align="center">Supported WX Components </h1>
 
 
 WX Widgets supported and managed by re-wx can all be found in the `rewx.components` module. 
