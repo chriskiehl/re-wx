@@ -26,7 +26,7 @@
   </tr>
 </table
 
-![PyPI](https://img.shields.io/pypi/v/gooey)
+![PyPI](https://img.shields.io/pypi/v/re-wx)
 
 
 # Overview
