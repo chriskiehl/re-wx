@@ -53,7 +53,7 @@ Re-wx lets you build expressive, maintainable applications out of simple, testab
 
 ## Alpha Note: 
 
-This is an early release. Expect some bugs, feature gaps, and a bit of API instability. 
+This is an early release and under active development. Expect a few bugs, feature gaps, and a bit of API instability. If you hit any snags, pop over to the [issues](https://github.com/chriskiehl/re-wx/issues) and let me know!
 
 
 ## Installation 
