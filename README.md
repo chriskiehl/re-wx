@@ -9,19 +9,19 @@
 <table>
   <tr>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/basic-video-player.PNG">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/basic-video-player.PNG"/>
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/color-picker.png"/>
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/kitchen-sink.png">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/kitchen-sink.png" />
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/color-picker.png">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" />
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG" />
     </td>
   </tr>
 </table
