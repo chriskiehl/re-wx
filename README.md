@@ -18,10 +18,10 @@
       <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/kitchen-sink.png">
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/basic-video-player.PNG">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/color-picker.png">
     </td>
     <td>
-      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/linux-youtube-dl.PNG">
+      <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png">
     </td>
   </tr>
 </table
@@ -148,6 +148,7 @@ For the rest of this guide, we'll be using the `wsx` form, but you can use `crea
 
 
 <br/>
+
 ### A Stateful component 
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/clock.png" align=right >
@@ -222,6 +223,7 @@ if __name__ == '__main__':
 ```    
    
 <br/>
+
 ### An Application
 
 <img src="https://github.com/chriskiehl/re-wx-images/raw/images/screenshots/todo-app.png" align=right >
