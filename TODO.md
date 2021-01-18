@@ -8,6 +8,7 @@
     * document departures from WX's API (for instance, ListCtrl's simplified interface)
         * document other API helpers, like block, bitmap button, etc.. 
     * document layout philosophy and BoxSizer usage  
+    * Document common wsx errors `TypeError: unhashable type: 'dict'`  
 * Examples: 
     * Youtube-DL 
     * Gooey 

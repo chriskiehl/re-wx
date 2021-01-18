@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from rewx.rewx2 import create_element, wsx
+from rewx import create_element, wsx
 
 
 class TestCreateElement(TestCase):

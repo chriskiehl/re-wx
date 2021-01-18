@@ -1,4 +1,3 @@
-from typing import Dict
 
 def callwith(f, *args, **kwargs):
     def inner(*ignoreargs, **ignorekwargs):

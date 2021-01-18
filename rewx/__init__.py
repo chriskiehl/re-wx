@@ -1,2 +1,2 @@
-from rewx.rewx2 import *
+from rewx.core import *
 

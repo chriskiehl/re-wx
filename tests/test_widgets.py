@@ -1,7 +1,9 @@
 import wx
 from unittest import TestCase
 
-from rewx.rewx2 import mount, create_element
+from copy import deepcopy, copy
+
+from rewx import mount, create_element
 from rewx import components
 
 
@@ -93,7 +95,7 @@ class TestWidgets(TestCase):
         return create_element(type, {})
 
     def populated_element(self, type):
-        return create_element(type, valid_props.get(type, base_props))
+        return create_element(type, valid_props.get(type, {**base_props}))
 
     def test_empty_mounting(self):
         """
@@ -122,7 +124,11 @@ class TestWidgets(TestCase):
                 # RadioBox doesn't allow constructions without `choices`
                 # being present
                 if element['type'] == wx.RadioBox:
+                    element = self.populated_element(wx.RadioBox)
                     element['props']['choices'] = ['a', 'b', 'c']
+                elif element['type'] == wx.CheckBox:
+                    element = self.populated_element(wx.CheckBox)
+                    element['props']['value'] = True
                 instance = mount(element, parent)
                 self.assertIsNotNone(instance)
                 self.assertIsInstance(instance, element['type'])

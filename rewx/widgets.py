@@ -1,4 +1,7 @@
-
+"""
+This module contains all of the mount/update
+functions for re-wx's supported widget types.
+"""
 import wx
 import wx.adv
 import wx.media
@@ -36,17 +39,29 @@ basic_controls = {
     'style': 'SetStyle',
 }
 
+exclusions = {
+    wx.ActivityIndicator: {'value', 'label'},
+    wx.Button: {'value'},
+    wx.BitmapButton: {'value'},
+    wx.adv.CalendarCtrl: {'value'},
+    wx.Frame: {'value'},
+    SVG: {'value'},
+    SVGButton: {'value'},
+    ScrolledPanel: {'value'}
+}
+
 
 
 
 
 
 def set_basic_props(instance, props):
+    available_controls = exclude(basic_controls, exclusions.get(instance.__class__, []))
     for key, val in props.items():
         if key.startswith('on_'):
             continue
         try:
-            getattr(instance, basic_controls[key])(val)
+            getattr(instance, available_controls[key])(val)
         except KeyError:
             # prop which doesn't apply to this control
             pass
@@ -64,16 +79,15 @@ def frame(element, instance: wx.Frame):
         instance.SetTitle(props['title'])
     if 'show' in props:
         instance.Show(props['show'])
+    if 'size' in props:
+        instance.SetSize(props['size'])
     if 'icon_uri' in props:
         instance.SetIcon(wx.Icon(props['icon_uri']))
+    if 'on_close' in props:
+        instance.Bind(wx.EVT_CLOSE, props['on_close'])
     else:
         instance.SetIcon(wx.Icon(os.path.join(dirname, 'icon.png')))
     return instance
-    # if props.get('start'):
-    #     instance.Stop()
-    # else:
-    #     instance.Stop()
-    # return instance
 
 
 @mount.register(wx.ActivityIndicator)
@@ -133,8 +147,9 @@ def bitmapbutton(element, instance: wx.BitmapButton):
 
     if instance.GetBitmap():
         instance.GetBitmap().Destroy()
-    bitmap = wx.Bitmap(props.get('uri'))
-    instance.SetBitmap(bitmap)
+    if 'uri' in props:
+        bitmap = wx.Bitmap(props.get('uri'))
+        instance.SetBitmap(bitmap)
 
     instance.Unbind(wx.EVT_BUTTON)
     if props.get('on_click'):
@@ -217,7 +232,7 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
     # to see if it's worth the effort.
     for _ in instance.GetItems():
         instance.Delete(0)
-    instance.AppendItems(props['choices'])
+    instance.AppendItems(props.get('choices', []))
     if 'value' in props:
         instance.SetSelection(props['choices'].index(element['props'].get('value')))
 
@@ -323,7 +338,7 @@ def svg(element, instance: SVG) -> SVG:
     else:
         # URI isn't present, so we replace the current bitmap (if
         # any) with a blank one
-        instance.SetBitmap(wx.Bitmap)
+        instance.SetBitmap(wx.Bitmap())
         return instance
 
 
@@ -356,7 +371,7 @@ def svgbutton(element, instance: SVGButton) -> SVGButton:
     else:
         # URI isn't present, so we replace the current bitmap (if
         # any) with a blank one
-        instance.SetBitmap(wx.Bitmap)
+        instance.SetBitmap(wx.Bitmap())
         return instance
 
 

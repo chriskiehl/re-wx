@@ -3,8 +3,8 @@ import wx
 
 def dispatch(func):
     """
-    TODO: don't expose this from the module, only mount/patch methods
-    TODO: DOCS
+    Constructs a registry for performing single dispatch based on
+    the class (not instance) type
     """
     registry = {'default': func}
 
