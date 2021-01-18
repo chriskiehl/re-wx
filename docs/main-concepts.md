@@ -5,7 +5,7 @@
 * [Rendering](#Rendering)
 * [Creating reusable Elements](#Creating-reusable-Elements)
 * [Components](#Components)
-* [Component and State](#Component-and-state)
+* [Component and State](#Components-and-state)
 * [Component lifecycle methods](#Component-lifecycle-methods)
 * [Running re-wx Applications](#Running-re-wx-Applications)
 
