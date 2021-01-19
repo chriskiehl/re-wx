@@ -116,7 +116,7 @@ An important note is that Elements are _plain data_ -- literally just a Python d
   'type': Frame, 
   'props': {
       'title': 'My Cool Application', 
-      'show': True
+      'show': True,
       'children': [{
         'type': StaticText,
         'props': {'label': 'Howdy, cool person!'}
