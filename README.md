@@ -109,7 +109,7 @@ Here we've created two elements. A top-level `Frame` type, which is required by 
 
 Elements all consist of three pieces of data: 1. the `type` of the entity we want to render into the UI, 3. the properties ("props" from here on out) we want that entity to have, and 3. any children, which are themselves Elements. 
 
-An important note is that Elements are _plain data_ -- literally just a Python map like this: 
+An important note is that Elements are _plain data_ -- literally just a Python dict like this: 
 
 ```python
 {
