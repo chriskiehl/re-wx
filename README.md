@@ -60,7 +60,7 @@ This is an early release and under active development. Expect a few bugs, featur
 
 The latest stable version is available on PyPi. 
 ```
-pip install rewx 
+pip install re-wx 
 ```
 
 ## Documentation 
