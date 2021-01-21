@@ -353,6 +353,39 @@ That's it! Now when the component gets mounted onto the wx Window, we'll kick of
 
 At a high level, that's all there is to Components. With Elements, Functions, and Components under our belt, we've got all the tools we need to build advanced applications using re-wx! 
 
+## Refs 
+
+Refs let you get a reference to the wx Widgets which get created when your Component mounts. They give you a way to handle lower-level actions like managing text selections or MediaController playback. They're also a handy general escape hatch for using any parts of WX which aren't directly wrapped or supported by re-wx. 
+
+Refs are created using the `rewx.Ref()` constructor and attaching the instance to the target element's props. 
+
+```python
+from rewx import Ref 
+
+class MyComponent(Component): 
+    def __init__(props): 
+        super().__init__(props) 
+        self.my_ref = Ref()
+        
+    def render():
+        return wsx([StaticText {'ref': self.my_ref}])
+```
+
+Now, when the component mounts, you'll have access the full `wx.StaticText` instance inside of the `self.my_ref` variable. 
+
+```python
+from rewx import Ref 
+
+class MyComponent(Component): 
+    ...
+    
+    def component_did_mount():
+        text: wx.StaticText = self.my_ref.instance
+        # now you can do anything with the instance
+    
+```
+
+
 
 ## Running re-wx Applications
 
