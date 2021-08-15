@@ -5,11 +5,14 @@ functions for re-wx's supported widget types.
 import wx
 import wx.adv
 import wx.media
+import wx.html
+import wx.html2
 import wx.svg
 # TODO: warn on unknown props?
 import os
 from wx.lib.scrolledpanel import ScrolledPanel
 from rewx.dispatch import mount, update
+from wx.richtext import RichTextCtrl
 
 from rewx.components import Block, Grid, TextArea, SVG,SVGButton
 from rewx.util import exclude
@@ -479,10 +482,81 @@ def statictext(element, instance: wx.StaticText):
         instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
     return instance
 
+@mount.register(wx.html2.WebView)
+def webview(element, parent):
+    return update(element, wx.html2.WebView.New(parent))
+
+
+@update.register(wx.html2.WebView)
+def webview(element, instance: wx.html2.WebView):
+    # TODO: it does NOT response to 'SetValue'
+    # this means set_basic needs to accept a map, not use
+    # a fixed list.
+    props = {**element['props']}
+    value = props.get('value','')
+    if 'value' in props:
+        instance.SetPage(props['value'], '/')
+    return instance
+
+
+@mount.register(wx.html.HtmlWindow)
+def htmlwindow(element, parent):
+    return update(element, wx.html.HtmlWindow(parent))
+
+
+@update.register(wx.html.HtmlWindow)
+def htmlwindow(element, instance: wx.html.HtmlWindow):
+    # TODO: it does NOT response to 'SetValue'
+    # this means set_basic needs to accept a map, not use
+    # a fixed list.
+    props = {**element['props']}
+    value = props.get('value','')
+    if 'value' in props:
+        instance.SetPage(props['value'])
+    return instance
+
+
+
+@mount.register(RichTextCtrl)
+def richtextctrl(element, parent):
+    setonce_styles = element['props'].get('style', wx.TE_MULTILINE)
+    return update(element, RichTextCtrl(parent, style=setonce_styles | wx.TE_MULTILINE))
+
+
+@update.register(RichTextCtrl)
+def richtextctrl(element, instance: RichTextCtrl):
+    # TODO: it does NOT response to 'SetValue'
+    # this means set_basic needs to accept a map, not use
+    # a fixed list.
+    props = {**element['props']}
+    value = props.get('value','')
+    if 'value' in props:
+        del props['value']
+    # The style argument has different meaning are construction
+    # time versus instance time. At construction, it's the usual
+    # wx style flags. However, once the instance is created, 'style'
+    # controls the internal style of the textctrl's text buffer
+    if 'style' in props:
+        del props['style']
+        # props['style'] = props['style'] | wx.TE_MULTILINE
+
+    set_basic_props(instance, props)
+    before = instance.GetInsertionPoint()
+    instance.ChangeValue(value)
+    instance.SetInsertionPoint(before)
+    instance.Unbind(wx.EVT_LEFT_DOWN)
+    instance.Unbind(wx.EVT_TEXT)
+    if 'on_click' in props:
+        instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
+    if 'on_change' in props:
+        instance.Bind(wx.EVT_TEXT, props['on_change'])
+    return instance
+
 
 @mount.register(TextArea)
 def textarea(element, parent):
-    return update(element, TextArea(parent, style=wx.TE_MULTILINE))
+    setonce_styles = element['props'].get('style', wx.TE_MULTILINE)
+    return update(element, TextArea(parent, style=setonce_styles | wx.TE_MULTILINE))
 
 @update.register(TextArea)
 def textarea(element, instance: TextArea):
@@ -493,8 +567,12 @@ def textarea(element, instance: TextArea):
     value = props.get('value','')
     if 'value' in props:
         del props['value']
+    # The style argument has different meaning are construction
+    # time versus instance time. At construction, it's the usual
+    # wx style flags. However, once the instance is created, 'style'
+    # controls the internal style of the textctrl's text buffer
     if 'style' in props:
-        props['style'] = props['style'] | wx.TE_MULTILINE
+        del props['style']
 
     set_basic_props(instance, props)
     before = instance.GetInsertionPoint()

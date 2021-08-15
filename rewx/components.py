@@ -5,8 +5,10 @@ supported by rewx.
 import wx
 import wx.adv
 import wx.lib.scrolledpanel
+import wx.richtext
 import wx.media
-
+import wx.html
+import wx.html2
 
 ActivityIndicator = wx.ActivityIndicator
 Button = wx.Button
@@ -34,6 +36,9 @@ StaticText = wx.StaticText
 TextCtrl = wx.TextCtrl
 ToggleButton = wx.ToggleButton
 MediaCtrl = wx.media.MediaCtrl
+RichTextCtrl = wx.richtext.RichTextCtrl
+HtmlWindow = wx.html.HtmlWindow
+WebView = wx.html2.WebView
 
 
 class Grid(wx.Panel):
