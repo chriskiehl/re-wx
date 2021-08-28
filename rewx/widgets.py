@@ -249,16 +249,17 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 
 @mount.register(wx.Gauge)
 def gauge(element, parent):
-    return wx.Gauge(parent)
+    size = element['props'].get('size', (-1, -1))
+    return update(element, wx.Gauge(parent, size=size))
 
 @update.register(wx.Gauge)
 def gauge(element, instance: wx.Gauge) -> wx.Object:
     props = element['props']
-    set_basic_props(instance, props)
     if props.get('range'):
         instance.SetRange(props['range'])
     if props.get('pulse', False):
         instance.Pulse()
+    set_basic_props(instance, props)
     return instance
 
 
