@@ -205,6 +205,8 @@ def render(element, parent):
                     child['props'].get('flag', 0),
                     child['props'].get('border', 0)
                 )
+        if isinstance(instance, wx.Frame):
+            instance.Layout()
         return instance
     elif type(element['type']) == type:
         return element['type'].render_component(element, parent)
