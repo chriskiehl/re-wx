@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="re-wx",
-    version="0.00.05",
+    version="0.00.06",
     author="Chris Kiehl",
     author_email="me@chriskiehl.com",
     description="A library for building modern declarative desktop applications in WX",
