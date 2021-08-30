@@ -158,6 +158,7 @@ class Component:
         parent = dom.GetParent()
         # TODO: is any of this right..?
         if hasattr(dom, '_instance') and type(dom._instance).__name__ == vdom['type'].__name__:
+            dom._instance.props = vdom['props']
             return patch(dom, dom._instance.render())
         if cls.__name__ == vdom['type'].__name__:
             return cls.render_component(vdom, parent)
