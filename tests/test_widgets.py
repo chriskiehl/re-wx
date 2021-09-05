@@ -45,6 +45,10 @@ valid_props = {
     wx.RadioButton: {
         **exclude(base_props, {'value'})
     },
+    wx.Gauge: {
+        **base_props,
+        'value': 1
+    },
     wx.Slider: {
         **base_props,
         'value': 10,

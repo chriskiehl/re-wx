@@ -56,8 +56,6 @@ exclusions = {
 
 
 
-
-
 def set_basic_props(instance, props):
     available_controls = exclude(basic_controls, exclusions.get(instance.__class__, []))
     for key, val in props.items():
@@ -70,9 +68,11 @@ def set_basic_props(instance, props):
             pass
     return instance
 
+
 @mount.register(wx.Frame)
 def frame(element, parent) -> wx.Frame:
     return update(element, wx.Frame(None))
+
 
 @update.register(wx.Frame)
 def frame(element, instance: wx.Frame):
@@ -533,13 +533,12 @@ def richtextctrl(element, instance: RichTextCtrl):
     value = props.get('value','')
     if 'value' in props:
         del props['value']
-    # The style argument has different meaning are construction
+    # The style argument has different meaning at construction
     # time versus instance time. At construction, it's the usual
     # wx style flags. However, once the instance is created, 'style'
     # controls the internal style of the textctrl's text buffer
     if 'style' in props:
         del props['style']
-        # props['style'] = props['style'] | wx.TE_MULTILINE
 
     set_basic_props(instance, props)
     before = instance.GetInsertionPoint()
@@ -663,15 +662,19 @@ def grid(element, instance: Grid):
     return instance
 
 
-
 @mount.register(wx.TextCtrl)
 def textctrl(element, parent):
-    return update(element, wx.TextCtrl(parent))
+    style = element['props'].get('style', wx.TE_LEFT)
+    size = element['props'].get('size', (-1, -1))
+    return update(element, wx.TextCtrl(parent, style=style, size=size))
 
 
 @update.register(wx.TextCtrl)
 def textctrl(element, instance: wx.TextCtrl):
     props = {**element['props']}
+    if 'style' in props:
+        del props['style']
+
     value = props.get('value')
     try:
         del props['value']

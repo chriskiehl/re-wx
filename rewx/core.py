@@ -166,13 +166,10 @@ class Component:
             return patch(dom, vdom['type'](vdom['props']))
 
 
-
-
     def component_did_mount(self):
         pass
 
     def component_will_unmount(self):
-        print('gooodbye!')
         pass
 
     def render(self):
