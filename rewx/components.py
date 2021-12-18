@@ -39,7 +39,7 @@ MediaCtrl = wx.media.MediaCtrl
 RichTextCtrl = wx.richtext.RichTextCtrl
 HtmlWindow = wx.html.HtmlWindow
 WebView = wx.html2.WebView
-
+Notebook = wx.Notebook
 
 class Grid(wx.Panel):
     """
@@ -73,3 +73,18 @@ class SVGButton(wx.BitmapButton):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class NotebookItem(wx.Panel):
+    """
+    Wrapper allowing the specification of Notebook pages
+    as children. e.g.
+
+    ```
+    [Notebook, {on_change: handler},
+      [NotebookItem, {'active': True}
+        [AnyComponent, {...}]],
+      [NotebookItem, {'active': False}
+        [AnyComponent, {...}]]]
+    ```
+    """
