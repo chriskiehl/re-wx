@@ -179,7 +179,10 @@ class Component:
         # TODO: is any of this right..?
         if hasattr(dom, '_instance') and type(dom._instance).__name__ == vdom['type'].__name__:
             dom._instance.props = vdom['props']
-            return patch(dom, dom._instance.render())
+            updated = patch(dom, dom._instance.render())
+            updated._instance.component_did_update(updated._instance.props)
+            return updated
+
         if cls.__name__ == vdom['type'].__name__:
             return cls.render_component(vdom, parent)
         else:
@@ -190,6 +193,9 @@ class Component:
         pass
 
     def component_will_unmount(self):
+        pass
+
+    def component_did_update(self, next_state):
         pass
 
     def render(self):
@@ -206,7 +212,8 @@ class Component:
             patch(self.base, self.render())
             p.Thaw()
 
-
+def isfunction(element):
+    return callable(element['type']) and not isclass(element['type'])
 
 def render(element, parent):
     if isclass(element['type']) and issubclass(element['type'], wx.Object):
@@ -214,6 +221,15 @@ def render(element, parent):
         if element['props'].get('ref'):
             element['props'].get('ref').update_ref(instance)
         for child in element['props'].get('children', []):
+            # Implementation Note:
+            # Stateless Function Components are just simple convenience wrappers for bundling up
+            # related Elements in in rewx. They have no directly instantiatable object type.
+            # Effectively, it's just like a Thunked blob of Elements. As such, when we encounter
+            # a SFC, to get the actual rewx Elements, we evaluate the function and its props thus
+            # yielding an Element Tree we can actually mount / render.
+            if isfunction(child):
+                # evaluating the SFC to get the actual child contents
+                child = child['type'](child['props'])
             sizer = instance.GetSizer()
             if not sizer:
                 render(child, instance)

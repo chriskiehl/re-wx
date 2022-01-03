@@ -52,6 +52,7 @@ exclusions = {
     wx.BitmapButton: {'value'},
     wx.adv.CalendarCtrl: {'value'},
     wx.Frame: {'value'},
+    Block: {'style'},
     SVG: {'value'},
     SVGButton: {'value'},
     ScrolledPanel: {'value'}
@@ -264,7 +265,9 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 @mount.register(wx.Gauge)
 def gauge(element, parent):
     size = element['props'].get('size', (-1, -1))
-    return update(element, wx.Gauge(parent, size=size))
+    gauge = wx.Gauge(parent, size=size)
+    gauge._pulsing = False
+    return update(element, gauge)
 
 @update.register(wx.Gauge)
 def gauge(element, instance: wx.Gauge) -> wx.Object:
@@ -275,7 +278,9 @@ def gauge(element, instance: wx.Gauge) -> wx.Object:
         value = props['value']
         if value < 0:
             instance.Pulse()
+            instance._pulsing = True
         else:
+            instance._pulsing = False
             value = min(int(value), instance.GetRange())
             if instance.GetValue() != value:
                 # Windows 7 progress bar animation hack:
@@ -655,7 +660,7 @@ def panel(element, instance: wx.Panel):
 
 @mount.register(Block)
 def block(element, parent):
-    panel = update(element, Block(parent))
+    panel = update(element, Block(parent, style=element['props'].get('style', wx.TAB_TRAVERSAL)))
     sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
     panel.SetSizer(sizer)
     return panel
