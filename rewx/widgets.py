@@ -704,6 +704,8 @@ def staticbitmap(element, instance: wx.StaticBitmap):
     if 'uri' in props:
         bitmap = wx.Bitmap(props.get('uri'))
         instance.SetBitmap(bitmap)
+    if 'on_click' in props:
+        instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
     return instance
 
 
