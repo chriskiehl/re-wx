@@ -2,6 +2,8 @@
 https://medium.com/@sweetpalma/gooact-react-in-160-lines-of-javascript-44e0742ad60f
 """
 import functools
+from threading import Lock
+
 import wx
 from inspect import isclass
 
@@ -81,6 +83,18 @@ def patch(dom: wx.Window, vdom):
                 child.Destroy()
             dom.Destroy()
             newdom = render(vdom, parent)
+        elif isinstance(dom, vdom['type']) and getattr(dom, 'self_managed', False):
+            # self-managed components manage their children by hand rather than
+            # automatically via the rewx dom. As such, we don't perform any child
+            # diffing or reconciliation operations for them. The virtualdom will NOT
+            # match the actual dom for these widgets.
+            #
+            # Background: These components are legacy/vanilla wx components the user created
+            # which have been introduced into rewx land through custom mount/update handlers.
+            # These are commonly used while porting over existing code or for wx components
+            # which are sufficiently cranky about their child management.
+            update(vdom, dom)
+            newdom = dom
         elif isinstance(dom, vdom['type']):
             update(vdom, dom)
             pool = {f'__index_{index}': child for index, child in enumerate(dom.GetChildren())}
@@ -112,8 +126,13 @@ def patch(dom: wx.Window, vdom):
             # above loop represent wx.Objects which are no longer
             # part of the virtualdom and should thus be removed.
             for key, orphan in pool.items():
-                dom.RemoveChild(orphan)
-                orphan.Destroy()
+                # Debugging InspectionFrame gets lumped in with the
+                # top-level hierarchy. We want to leave this alone as
+                # it's there for debugging and not part of the actual
+                # declared component tree
+                if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
+                    dom.RemoveChild(orphan)
+                    orphan.Destroy()
 
             newdom = dom
         else:
@@ -138,6 +157,7 @@ class Component:
         self.state = None
         # this gets set dynamically once mounted / instantiated
         self.base = None
+        self._lock = Lock()
 
     @classmethod
     def render_component(cls, vdom, parent=None):
@@ -159,7 +179,10 @@ class Component:
         # TODO: is any of this right..?
         if hasattr(dom, '_instance') and type(dom._instance).__name__ == vdom['type'].__name__:
             dom._instance.props = vdom['props']
-            return patch(dom, dom._instance.render())
+            updated = patch(dom, dom._instance.render())
+            updated._instance.component_did_update(updated._instance.props)
+            return updated
+
         if cls.__name__ == vdom['type'].__name__:
             return cls.render_component(vdom, parent)
         else:
@@ -172,20 +195,25 @@ class Component:
     def component_will_unmount(self):
         pass
 
+    def component_did_update(self, next_state):
+        pass
+
     def render(self):
         return None
 
     def set_state(self, next_state):
-        prev_state = self.state
-        self.state = next_state
-        p = self.base
-        while p.GetParent() != None:
-            p = p.GetParent()
-        p.Freeze()
-        patch(self.base, self.render())
-        p.Thaw()
+        with self._lock:
+            prev_state = self.state
+            self.state = next_state
+            p = self.base
+            while p.GetParent() != None:
+                p = p.GetParent()
+            p.Freeze()
+            patch(self.base, self.render())
+            p.Thaw()
 
-
+def isfunction(element):
+    return callable(element['type']) and not isclass(element['type'])
 
 def render(element, parent):
     if isclass(element['type']) and issubclass(element['type'], wx.Object):
@@ -193,6 +221,15 @@ def render(element, parent):
         if element['props'].get('ref'):
             element['props'].get('ref').update_ref(instance)
         for child in element['props'].get('children', []):
+            # Implementation Note:
+            # Stateless Function Components are just simple convenience wrappers for bundling up
+            # related Elements in in rewx. They have no directly instantiatable object type.
+            # Effectively, it's just like a Thunked blob of Elements. As such, when we encounter
+            # a SFC, to get the actual rewx Elements, we evaluate the function and its props thus
+            # yielding an Element Tree we can actually mount / render.
+            if isfunction(child):
+                # evaluating the SFC to get the actual child contents
+                child = child['type'](child['props'])
             sizer = instance.GetSizer()
             if not sizer:
                 render(child, instance)

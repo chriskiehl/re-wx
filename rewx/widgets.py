@@ -13,10 +13,11 @@ import os
 from wx.lib.scrolledpanel import ScrolledPanel
 from rewx.dispatch import mount, update
 from wx.richtext import RichTextCtrl
-
-from rewx.components import Block, Grid, TextArea, SVG,SVGButton
+import sys
+from rewx.components import Block, Grid, TextArea, SVG, SVGButton, NotebookItem
 from rewx.util import exclude
-
+from rewx.bitmap_support import load, resize_image, to_bitmap
+from util.functional import identity
 
 dirname = os.path.dirname(__file__)
 
@@ -44,10 +45,14 @@ basic_controls = {
 
 exclusions = {
     wx.ActivityIndicator: {'value', 'label'},
-    wx.Button: {'value'},
+    wx.ListBox: {'value', 'label'},
+    wx.Button: {'value', 'style'},
+    wx.StaticLine: {'value', 'style'},
+    wx.Gauge: {'value'},
     wx.BitmapButton: {'value'},
     wx.adv.CalendarCtrl: {'value'},
     wx.Frame: {'value'},
+    Block: {'style'},
     SVG: {'value'},
     SVGButton: {'value'},
     ScrolledPanel: {'value'}
@@ -71,7 +76,12 @@ def set_basic_props(instance, props):
 
 @mount.register(wx.Frame)
 def frame(element, parent) -> wx.Frame:
-    return update(element, wx.Frame(None))
+    instance = wx.Frame(None)
+    props = element['props']
+    if 'size' in props:
+        instance.SetSize(props['size'])
+    instance.SetDoubleBuffered(props.get('double_buffered', False))
+    return update(element, instance)
 
 
 @update.register(wx.Frame)
@@ -82,8 +92,6 @@ def frame(element, instance: wx.Frame):
         instance.SetTitle(props['title'])
     if 'show' in props:
         instance.Show(props['show'])
-    if 'size' in props:
-        instance.SetSize(props['size'])
     if 'icon_uri' in props:
         instance.SetIcon(wx.Icon(props['icon_uri']))
     if 'on_close' in props:
@@ -109,13 +117,20 @@ def activity_indicator(element, instance: wx.ActivityIndicator):
 
 @mount.register(wx.Button)
 def button(element, parent):
-    return update(element, wx.Button(parent))
+    return update(element, wx.Button(parent, element['props'].get('style')))
 
 
 @update.register(wx.Button)
 def button(element, instance: wx.Button):
     props = element['props']
     set_basic_props(instance, props)
+    if props.get('enabled') is False:
+        # we navigate away from the control when disabling.
+        # Without this, under conditions where the button gets
+        # disabled / re-enabled quickly, wx will still feed events
+        # spawned while it was disable to the now recently enabled
+        # button. This behavior doesn't happen if we navigate away
+        instance.Navigate()
     instance.Unbind(wx.EVT_BUTTON)
     if props.get('on_click'):
         instance.Bind(wx.EVT_BUTTON, props['on_click'])
@@ -250,28 +265,68 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 @mount.register(wx.Gauge)
 def gauge(element, parent):
     size = element['props'].get('size', (-1, -1))
-    return update(element, wx.Gauge(parent, size=size))
+    gauge = wx.Gauge(parent, size=size)
+    gauge._pulsing = False
+    return update(element, gauge)
 
 @update.register(wx.Gauge)
 def gauge(element, instance: wx.Gauge) -> wx.Object:
     props = element['props']
-    if props.get('range'):
+    if 'range' in props:
         instance.SetRange(props['range'])
-    if props.get('pulse', False):
-        instance.Pulse()
+    if 'value' in props:
+        value = props['value']
+        if value < 0:
+            instance.Pulse()
+            instance._pulsing = True
+        else:
+            instance._pulsing = False
+            value = min(int(value), instance.GetRange())
+            if instance.GetValue() != value:
+                # Windows 7 progress bar animation hack:
+                # http://stackoverflow.com/questions/5332616/disabling-net-progressbar-animation-when-changing-value
+                # tl;dr: set it to the desired range then subtract 1.
+                if props.get('disable_animation', False) and sys.platform.startswith("win"):
+                    if instance.GetRange() == value:
+                        instance.SetValue(value)
+                        instance.SetValue(value - 1)
+                    else:
+                        instance.SetValue(value + 1)
+                else:
+                    instance.SetValue(value)
     set_basic_props(instance, props)
     return instance
 
 
 @mount.register(wx.ListBox)
 def listbox(element, parent):
-    return wx.ListBox(parent)
+    return update(element, wx.ListBox(parent, choices=element['props'].get('choices', [])))
 
 @update.register(wx.ListBox)
 def listbox(element, instance: wx.ListBox):
     props = element['props']
-    # TODO:
-    pass
+    # ComboBox is a textctrl and listbox linked together.
+    # Updating one causes events to fire for the other, so
+    # to avoid doubling up the events, we unhook everything,
+    # perform the updates, and then re-add the handlers.
+    # instance.Unbind(wx.EVT_LISTBOX)
+
+    set_basic_props(instance, props)
+    # we blanket delete/recreate the items for now, which
+    # seems to be Good Enough. Child diffing could be benchmarked
+    # to see if it's worth the effort.
+    # for _ in instance.GetItems():
+    #     instance.Delete(0)
+    # instance.AppendItems(props.get('choices', []))
+    if 'value' in props:
+        instance.SetSelection(element['props'].get('value'))
+
+    # TODO: control this component similar to Notebook
+    if props.get('on_change'):
+        instance.Unbind(wx.EVT_LISTBOX)
+        instance.Bind(wx.EVT_LISTBOX, props['on_change'])
+
+    return instance
 
 
 @mount.register(wx.ListCtrl)
@@ -605,7 +660,7 @@ def panel(element, instance: wx.Panel):
 
 @mount.register(Block)
 def block(element, parent):
-    panel = update(element, Block(parent))
+    panel = update(element, Block(parent, style=element['props'].get('style', wx.TAB_TRAVERSAL)))
     sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
     panel.SetSizer(sizer)
     return panel
@@ -693,7 +748,13 @@ def textctrl(element, instance: wx.TextCtrl):
 
 @mount.register(wx.StaticBitmap)
 def staticbitmap(element, parent):
-    return update(element, wx.StaticBitmap(parent))
+    instance = wx.StaticBitmap(parent)
+    if 'uri' not in element['props']:
+        raise KeyError('uri MUST be provided to BitMap objects')
+    instance._uri = element['props'].get('uri')
+    bitmap = wx.Bitmap(instance._uri)
+    instance.SetBitmap(bitmap)
+    return update(element, instance)
 
 
 @update.register(wx.StaticBitmap)
@@ -701,17 +762,20 @@ def staticbitmap(element, instance: wx.StaticBitmap):
     props = element['props']
     if instance.GetBitmap():
         instance.GetBitmap().Destroy()
-    if 'uri' in props:
+    if props['uri'] != instance._uri:
         bitmap = wx.Bitmap(props.get('uri'))
         instance.SetBitmap(bitmap)
     if 'on_click' in props:
         instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
+    if 'size' in props and props['size'] != instance.GetSize():
+        bitmap = to_bitmap(resize_image(load(props['uri']), props['size']))
+        instance.SetBitmap(bitmap)
     return instance
 
 
 @mount.register(wx.StaticLine)
 def staticline(element, parent):
-    return update(element, wx.StaticLine(parent))
+    return update(element, wx.StaticLine(parent, element['props']['style']))
 
 
 @update.register(wx.StaticLine)
@@ -760,7 +824,57 @@ def radiobutton(element, instance: wx.RadioButton):
     return instance
 
 
+def notebook_selection(f):
+    def inner(event):
+        # we want the state to drive the component, not the
+        # other way around. So, we clobber any incoming changes
+        # and defer to the user's handler.
+        event.GetEventObject().ChangeSelection(event.OldSelection)
+        return f(event)
+    return inner
 
+@mount.register(wx.Notebook)
+def notebook(element, parent):
+    instance = wx.Notebook(parent, element['props'].get('style', wx.BK_DEFAULT))
+    instance._changeHandler = None
+    return update(element, instance)
+
+@update.register(wx.Notebook)
+def notebook(element, instance: wx.Notebook):
+    props = element['props']
+    set_basic_props(instance, props)
+    handler = notebook_selection(props.get('on_change', identity))
+    if instance._changeHandler != handler:
+        instance.Unbind(wx.EVT_NOTEBOOK_PAGE_CHANGED)
+        instance.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, handler)
+        instance._changeHandler = handler
+    return instance
+
+
+
+@mount.register(NotebookItem)
+def notebookitem(element, parent):
+    instance = NotebookItem(parent)
+    parent: wx.Notebook = instance.GetParent()
+    if not isinstance(parent, wx.Notebook):
+        raise Exception('TODO: Notebook items can only be used with Notebooks')
+    parent.AddPage(instance, element['props'].get('title', 'Tab #XXX'))
+    sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
+    instance.SetSizer(sizer)
+    return update(element, instance)
+
+
+@update.register(NotebookItem)
+def notebookitem(element, instance: NotebookItem):
+    if element['props'].get('selected', False):
+        parent = instance.GetParent()
+        for index, child in enumerate(parent.GetChildren()):
+            if child == instance:
+                parent.ChangeSelection(index)
+                parent.Layout()
+                break
+    # set_basic_props(instance, element['props'])
+    return instance
 
 
 # TODO: keeping this arond to eventually generate prop validation
