@@ -1,3 +1,5 @@
+from typing import Any
+
 
 def callwith(f, *args, **kwargs):
     def inner(*ignoreargs, **ignorekwargs):
@@ -28,4 +30,10 @@ def exclude(m, keys):
     matching the supplied `keys`
     """
     return {k: v for k, v in m.items() if k not in keys}
+
+
+def identity(x: Any):
+    """The identity function.
+    Returns whatever was given to it."""
+    return x
 

@@ -17,7 +17,7 @@ import sys
 from rewx.components import Block, Grid, TextArea, SVG, SVGButton, NotebookItem
 from rewx.util import exclude
 from rewx.bitmap_support import load, resize_image, to_bitmap
-from util.functional import identity
+from rewx.util import identity
 
 dirname = os.path.dirname(__file__)
 
@@ -117,7 +117,8 @@ def activity_indicator(element, instance: wx.ActivityIndicator):
 
 @mount.register(wx.Button)
 def button(element, parent):
-    return update(element, wx.Button(parent, element['props'].get('style')))
+    default_style = 0
+    return update(element, wx.Button(parent, element['props'].get('style', default_style)))
 
 
 @update.register(wx.Button)
@@ -315,11 +316,13 @@ def listbox(element, instance: wx.ListBox):
     # we blanket delete/recreate the items for now, which
     # seems to be Good Enough. Child diffing could be benchmarked
     # to see if it's worth the effort.
-    # for _ in instance.GetItems():
-    #     instance.Delete(0)
-    # instance.AppendItems(props.get('choices', []))
-    if 'value' in props:
-        instance.SetSelection(element['props'].get('value'))
+    if set(instance.GetItems()) != set(props.get('choices', [])):
+        for _ in instance.GetItems():
+            instance.Delete(0)
+        instance.AppendItems(props.get('choices', []))
+
+    for selection in props.get('selected', []):
+        instance.SetSelection(selection)
 
     # TODO: control this component similar to Notebook
     if props.get('on_change'):
@@ -749,33 +752,39 @@ def textctrl(element, instance: wx.TextCtrl):
 @mount.register(wx.StaticBitmap)
 def staticbitmap(element, parent):
     instance = wx.StaticBitmap(parent)
-    if 'uri' not in element['props']:
-        raise KeyError('uri MUST be provided to BitMap objects')
-    instance._uri = element['props'].get('uri')
-    bitmap = wx.Bitmap(instance._uri)
-    instance.SetBitmap(bitmap)
+    instance._rewx_cache = {}
+    if element['props'].get('uri'):
+        uri = element['props'].get('uri')
+        instance._rewx_cache['uri'] = uri
+        bitmap = wx.Bitmap(uri)
+        instance.SetBitmap(bitmap)
     return update(element, instance)
 
 
 @update.register(wx.StaticBitmap)
 def staticbitmap(element, instance: wx.StaticBitmap):
     props = element['props']
-    if instance.GetBitmap():
-        instance.GetBitmap().Destroy()
-    if props['uri'] != instance._uri:
-        bitmap = wx.Bitmap(props.get('uri'))
-        instance.SetBitmap(bitmap)
+    if props.get('uri'):
+        # only load and update the image if it has changed.
+        if instance._rewx_cache.get('uri', 'rewx::nothing') != props['uri']:
+            if instance.GetBitmap():
+                instance.GetBitmap().Destroy()
+            bitmap = wx.Bitmap(props.get('uri'))
+            instance.SetBitmap(bitmap)
+
+        # ditto: only resize the image if its size prop has actually changed
+        if 'size' in props and props['size'] != instance.GetSize():
+            bitmap = to_bitmap(resize_image(load(props['uri']), props['size']))
+            instance.SetBitmap(bitmap)
     if 'on_click' in props:
         instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
-    if 'size' in props and props['size'] != instance.GetSize():
-        bitmap = to_bitmap(resize_image(load(props['uri']), props['size']))
-        instance.SetBitmap(bitmap)
     return instance
 
 
 @mount.register(wx.StaticLine)
 def staticline(element, parent):
-    return update(element, wx.StaticLine(parent, element['props']['style']))
+    style = element['props'].get('style', wx.HORIZONTAL)
+    return update(element, wx.StaticLine(parent, style))
 
 
 @update.register(wx.StaticLine)
@@ -857,7 +866,7 @@ def notebookitem(element, parent):
     instance = NotebookItem(parent)
     parent: wx.Notebook = instance.GetParent()
     if not isinstance(parent, wx.Notebook):
-        raise Exception('TODO: Notebook items can only be used with Notebooks')
+        raise Exception('Notebook items can only be used with Notebooks')
     parent.AddPage(instance, element['props'].get('title', 'Tab #XXX'))
     sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
     instance.SetSizer(sizer)

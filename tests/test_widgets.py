@@ -1,8 +1,7 @@
 import wx
 from unittest import TestCase
 
-from copy import deepcopy, copy
-
+from rewx.components import NotebookItem
 from rewx import mount, create_element
 from rewx import components
 
@@ -45,6 +44,11 @@ valid_props = {
     wx.RadioButton: {
         **exclude(base_props, {'value'})
     },
+    wx.ListBox: {
+        **exclude(base_props, {'value'}),
+        'choices': ['a', 'b'],
+        'selected': [0, 1]
+    },
     wx.Gauge: {
         **base_props,
         'value': 1
@@ -69,6 +73,9 @@ valid_props = {
         'increment': 0.01,
         'digits': 5
     },
+    wx.Notebook: {
+        **exclude(base_props, {'value'})
+    },
     wx.StaticBox: {
         **exclude(base_props, {'value'})
     },
@@ -91,9 +98,12 @@ valid_props = {
 class TestWidgets(TestCase):
 
     def get_defined_components(self):
+        required_props = (
+            NotebookItem,
+        )
         return [
             obj for name, obj in components.__dict__.items()
-            if name[0].isupper()]
+            if name[0].isupper() and obj not in required_props]
 
     def empty_element(self, type):
         return create_element(type, {})
