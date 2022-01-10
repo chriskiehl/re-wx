@@ -124,7 +124,7 @@ def button(element, instance: wx.Button):
 
 @mount.register(wx.ToggleButton)
 def togglebutton(element, parent):
-    return wx.ToggleButton(parent)
+    return update(element, wx.ToggleButton(parent))
 
 
 @update.register(wx.ToggleButton)
