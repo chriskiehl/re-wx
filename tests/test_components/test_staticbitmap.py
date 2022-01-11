@@ -3,6 +3,7 @@ import wx
 import wx.lib.inspection
 from pip._vendor.contextlib2 import contextmanager
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from rewx import create_element, wsx, render, patch
 import rewx.components as c
@@ -68,6 +69,15 @@ class TestStaticBitmap(TestCase):
             self.assertNotEqual(original_rgb, updated_rgb)
             # and we should have our pink color:
             self.assertEqual(updated_rgb, images.pink_rgb)
+
+        with self.subTest("updating props with same URI keeps existing image"):
+            # attaching a mock so we can assert the same URI doesn't cause
+            # a reloading of the image
+            mock = MagicMock()
+            bitmap.SetBitmap = mock
+
+            patch(bitmap, create_element(c.StaticBitmap, {'uri': images.pink_uri}))
+            mock.assert_not_called()
 
 
     def get_rgb(self, bitmap: wx.StaticBitmap):

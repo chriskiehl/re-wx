@@ -771,6 +771,7 @@ def staticbitmap(element, instance: wx.StaticBitmap):
                 instance.GetBitmap().Destroy()
             bitmap = wx.Bitmap(props.get('uri'))
             instance.SetBitmap(bitmap)
+            instance._rewx_cache['uri'] = props.get('uri')
 
         # ditto: only resize the image if its size prop has actually changed
         if 'size' in props and props['size'] != instance.GetSize():
