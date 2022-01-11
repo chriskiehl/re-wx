@@ -38,6 +38,9 @@ def my_stuff(props):
  * [Grid](#Grid)
  * [ListBox](#ListBox)
  * [ListCtrl](#ListCtrl)
+ * [MediaCtrl](#MediaCtrl)
+ * [Notebook](#Notebook)
+ * [NotebookItem](#NotebookItem)
  * [Panel](#Panel)
  * [RadioBox](#RadioBox)
  * [RadioButton](#RadioButton)
@@ -53,7 +56,7 @@ def my_stuff(props):
  * [TextArea](#TextArea)
  * [TextCtrl](#TextCtrl)
  * [ToggleButton](#ToggleButton)
- * [MediaCtrl](#MediaCtrl)
+ 
 
 
 
@@ -558,7 +561,7 @@ def listctrl_example(props):
 
 `column_defs` is how you define (a) what the columns of your table are, and (b) how the individual items in that column gets formatted. It's expressed as a list of maps, where each item in the list represents a column in your table. The `title` is used as the Column Header, and the `column` key should be a function (`A -> String`) which transforms an individual item from `data` into string form for display in the table. 
 
-**Availble Props:**
+**Availble Props:** 
 
 | key | Type | Description | 
 |------|------|---------|
@@ -582,6 +585,76 @@ def listctrl_example(props):
 
 
 
+
+## Notebook 
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/notebook.png">
+</p>
+
+Notebooks are used for creating tabbed layouts. The `Notebook` is that parent container that holds all the tabs in the UI. You add pages by specifying `NotebookItem`s as children. 
+ 
+**Example:**
+
+```python
+from rewx import wsx 
+from rewx.components import Notebook, NotebookItem, StaticText
+
+def example(props):
+    return wsx(
+      [Notebook, {'on_change': props['handle_selection']},    
+       [NotebookItem, {'title': 'Page 1', 'selected': props['activeSelection'] == 0},
+        [StaticText, {'label': "Hello!"}]],
+       [NotebookItem, {'title': 'Page 2!!!', 'selected': props['activeSelection'] == 1},
+        [StaticText, {'label': "Hello!"}]]]
+    )
+```
+
+**Availble Props:**
+
+| key | Type | Description | 
+|------|------|---------|
+|on_change| Callable[[CommandEvent], None] | A command event containing the selected index |
+|style| int | The style of the Notebook |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+
+<br />
+
+
+## NotebookItem 
+
+<p align="center">
+    <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/notebook.png">
+</p>
+
+`NotebookItem`s are just opaque containers that hold any component you supply. They can _only_ be used with `Notebook` and must be direct children. This let's rewx register all of your components as pages in the Notebook behind the scenes. 
+
+
+**Example:**
+
+```python
+from rewx import wsx 
+from rewx.components import Notebook, NotebookItem, StaticText
+
+def example(props):
+    return wsx(
+      [Notebook, {'on_change': props['handle_selection']},    
+       [NotebookItem, {'title': 'Page 1', 'selected': props['activeSelection'] == 0},
+        [StaticText, {'label': "Hello!"}]],
+       [NotebookItem, {'title': 'Page 2!!!', 'selected': props['activeSelection'] == 1},
+        [StaticText, {'label': "Hello!"}]]]
+    )
+```
+
+**Availble Props:**
+
+| key | Type | Description | 
+|------|------|---------|
+|selected | bool | A boolean controlling whether or not this tab is selected |
+|title | str| The title of the tab|
 
 
 
