@@ -41,6 +41,7 @@ basic_controls = {
     'show': 'Show',
     'enabled': 'Enable',
     'style': 'SetStyle',
+    'wx_name': 'SetName'
 }
 
 exclusions = {
@@ -93,11 +94,19 @@ def frame(element, instance: wx.Frame):
     if 'show' in props:
         instance.Show(props['show'])
     if 'icon_uri' in props:
-        instance.SetIcon(wx.Icon(props['icon_uri']))
-    if 'on_close' in props:
-        instance.Bind(wx.EVT_CLOSE, props['on_close'])
+        icon = wx.Icon(props['icon_uri'])
+        instance.SetIcon(icon)
+        if sys.platform != 'win32':
+            # OSX needs to have its taskbar icon explicitly set
+            # bizarrely, wx requires the TaskBarIcon to be attached to the Frame
+            # as instance data (self.). Otherwise, it will not render correctly.
+            frame.taskbarIcon = wx.TaskBarIcon(iconType=wx.adv.TBI_DOCK)
+            frame.taskbarIcon.SetIcon(icon)
     else:
         instance.SetIcon(wx.Icon(os.path.join(dirname, 'icon.png')))
+    if 'on_close' in props:
+        instance.Bind(wx.EVT_CLOSE, props['on_close'])
+
     return instance
 
 
@@ -321,8 +330,8 @@ def listbox(element, instance: wx.ListBox):
             instance.Delete(0)
         instance.AppendItems(props.get('choices', []))
 
-    for selection in props.get('selected', []):
-        instance.SetSelection(selection)
+    if 'value' in props:
+        instance.SetSelection(element['props'].get('value'))
 
     # TODO: control this component similar to Notebook
     if props.get('on_change'):
@@ -853,11 +862,10 @@ def notebook(element, parent):
 def notebook(element, instance: wx.Notebook):
     props = element['props']
     set_basic_props(instance, props)
-    handler = notebook_selection(props.get('on_change', identity))
-    if instance._changeHandler != handler:
-        instance.Unbind(wx.EVT_NOTEBOOK_PAGE_CHANGED)
-        instance.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, handler)
-        instance._changeHandler = handler
+    # handler = notebook_selection(props.get('on_change', identity))
+    # if instance._changeHandler != handler:
+    instance.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, props.get('on_change', identity))
+        # instance._changeHandler = handler
     return instance
 
 
@@ -938,7 +946,7 @@ _supported_props = {
             'SetRange': 'range: int', # sets the maximum value, so just needs an int
             'SetValue': 'value: int'
         },
-        'wx.ListBox': {
+        'wx.Listbox': {
             'style': 'style',
             'EVT_LISTBOX': 'on_change',
             'choices': 'choices', # update will use InsertItems,
