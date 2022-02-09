@@ -100,7 +100,7 @@ def frame(element, instance: wx.Frame):
             # OSX needs to have its taskbar icon explicitly set
             # bizarrely, wx requires the TaskBarIcon to be attached to the Frame
             # as instance data (self.). Otherwise, it will not render correctly.
-            frame.taskbarIcon = wx.TaskBarIcon(iconType=wx.adv.TBI_DOCK)
+            frame.taskbarIcon = wx.adv.TaskBarIcon(iconType=wx.adv.TBI_DOCK)
             frame.taskbarIcon.SetIcon(icon)
     else:
         instance.SetIcon(wx.Icon(os.path.join(dirname, 'icon.png')))
