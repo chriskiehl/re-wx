@@ -17,9 +17,8 @@ CalendarCtrl = wx.adv.CalendarCtrl
 CheckBox = wx.CheckBox
 # CollapsiblePane = wx.CollapsiblePane
 ComboBox = wx.ComboBox
-Dropdown = ComboBox
 DirPickerCtrl = wx.DirPickerCtrl
-FilePickerCtrl = wx.FilePickerCtrl
+Dropdown = ComboBox
 Frame = wx.Frame
 Gauge = wx.Gauge
 ListBox = wx.ListBox
@@ -33,6 +32,7 @@ SpinCtrl = wx.SpinCtrl
 SpinCtrlDouble = wx.SpinCtrlDouble
 StaticBitmap = wx.StaticBitmap
 StaticBox = wx.StaticBox
+StaticBoxSizer = wx.StaticBoxSizer
 StaticLine = wx.StaticLine
 StaticText = wx.StaticText
 TextCtrl = wx.TextCtrl
@@ -89,4 +89,20 @@ class NotebookItem(wx.Panel):
       [NotebookItem, {'active': False}
         [AnyComponent, {...}]]]
     ```
+    """
+
+class FilePickerCtrlOpen(wx.FilePickerCtrl):
+    """
+    Wrapper for a FilePickerCtrl with default style
+    `wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST`
+
+    https://docs.wxpython.org/wx.FilePickerCtrl.html
+    """
+
+class FilePickerCtrlSave(wx.FilePickerCtrl):
+    """
+    Wrapper for a FilePickerCtrl with style
+    `wx.FLP_SAVE`
+
+    https://docs.wxpython.org/wx.FilePickerCtrl.html
     """
