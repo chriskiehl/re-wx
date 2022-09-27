@@ -32,7 +32,6 @@ SpinCtrl = wx.SpinCtrl
 SpinCtrlDouble = wx.SpinCtrlDouble
 StaticBitmap = wx.StaticBitmap
 StaticBox = wx.StaticBox
-StaticBoxSizer = wx.StaticBoxSizer
 StaticLine = wx.StaticLine
 StaticText = wx.StaticText
 TextCtrl = wx.TextCtrl
