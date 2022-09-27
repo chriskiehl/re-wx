@@ -14,7 +14,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 from rewx.dispatch import mount, update
 from wx.richtext import RichTextCtrl
 import sys
-from rewx.components import Block, Grid, TextArea, SVG, SVGButton, NotebookItem
+from rewx.components import Block, Grid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave
 from rewx.util import exclude
 from rewx.bitmap_support import load, resize_image, to_bitmap
 from rewx.util import identity
@@ -56,7 +56,10 @@ exclusions = {
     Block: {'style'},
     SVG: {'value'},
     SVGButton: {'value'},
-    ScrolledPanel: {'value'}
+    ScrolledPanel: {'value'},
+    wx.DirPickerCtrl: {'style'},
+    FilePickerCtrlOpen: {'style'},
+    FilePickerCtrlSave: {'style'},
 }
 
 
@@ -272,11 +275,11 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
     return instance
 
 @mount.register(wx.DirPickerCtrl)
-def file_picker_ctrl(element, parent):
+def dir_picker_ctrl(element, parent):
     return update(element, wx.DirPickerCtrl(parent))
 
 @update.register(wx.DirPickerCtrl)
-def file_picker_ctrl(element, instance: wx.DirPickerCtrl):
+def dir_picker_ctrl(element, instance: wx.DirPickerCtrl):
     props = element['props']
     set_basic_props(instance, props)
     additions = {
@@ -290,12 +293,31 @@ def file_picker_ctrl(element, instance: wx.DirPickerCtrl):
         instance.Bind(wx.EVT_DIRPICKER_CHANGED, props['on_change'])
     return instance
 
-@mount.register(wx.FilePickerCtrl)
-def file_picker_ctrl(element, parent):
-    return update(element, wx.FilePickerCtrl(parent))
+@mount.register(FilePickerCtrlOpen)
+def file_picker_ctrl_open(element, parent):
+    return update(element, FilePickerCtrlOpen(parent))
 
-@update.register(wx.FilePickerCtrl)
-def file_picker_ctrl(element, instance: wx.FilePickerCtrl):
+@update.register(FilePickerCtrlOpen)
+def file_picker_ctrl_open(element, instance: FilePickerCtrlOpen):
+    props = element['props']
+    set_basic_props(instance, props)
+    additions = {
+        'path': 'SetPath'
+    }
+    for prop_key, wx_method in additions.items():
+        if prop_key in props:
+            getattr(instance, wx_method)(props[prop_key])
+    instance.Unbind(wx.EVT_FILEPICKER_CHANGED)
+    if props.get('on_change'):
+        instance.Bind(wx.EVT_FILEPICKER_CHANGED, props['on_change'])
+    return instance
+
+@mount.register(FilePickerCtrlSave)
+def file_picker_ctrl_save(element, parent):
+    return update(element, FilePickerCtrlSave(parent, style=wx.FLP_SAVE))
+
+@update.register(FilePickerCtrlSave)
+def file_picker_ctrl_save(element, instance: FilePickerCtrlSave):
     props = element['props']
     set_basic_props(instance, props)
     additions = {
@@ -517,6 +539,17 @@ def staticbox(element, instance: wx.StaticBox):
     # TODO: does this auto-use a sizer..?
     set_basic_props(instance, props)
 
+    return instance
+
+@mount.register(wx.StaticBoxSizer)
+def staticboxsizer(element, parent):
+    instance = wx.StaticBoxSizer(element['props'].get('orient', wx.VERTICAL), parent)
+    return update(element, instance)
+
+@update.register(wx.StaticBoxSizer)
+def staticboxsizer(element, instance: wx.StaticBoxSizer):
+    props = element['props']
+    set_basic_props(instance, props)
     return instance
 
 
