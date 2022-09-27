@@ -18,6 +18,7 @@ CheckBox = wx.CheckBox
 # CollapsiblePane = wx.CollapsiblePane
 ComboBox = wx.ComboBox
 Dropdown = ComboBox
+DirPickerCtrl = wx.DirPickerCtrl
 FilePickerCtrl = wx.FilePickerCtrl
 Frame = wx.Frame
 Gauge = wx.Gauge
