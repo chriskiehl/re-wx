@@ -541,18 +541,6 @@ def staticbox(element, instance: wx.StaticBox):
 
     return instance
 
-@mount.register(wx.StaticBoxSizer)
-def staticboxsizer(element, parent):
-    instance = wx.StaticBoxSizer(element['props'].get('orient', wx.VERTICAL), parent)
-    return update(element, instance)
-
-@update.register(wx.StaticBoxSizer)
-def staticboxsizer(element, instance: wx.StaticBoxSizer):
-    props = element['props']
-    set_basic_props(instance, props)
-    return instance
-
-
 @mount.register(wx.Slider)
 def slider(element, parent):
     return update(element, wx.Slider(parent))
