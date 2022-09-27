@@ -271,6 +271,24 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 
     return instance
 
+@mount.register(wx.FilePickerCtrl)
+def file_picker_ctrl(element, parent):
+    return update(element, wx.FilePickerCtrl(parent))
+
+@update.register(wx.FilePickerCtrl)
+def file_picker_ctrl(element, instance: wx.FilePickerCtrl):
+    props = element['props']
+    set_basic_props(instance, props)
+    additions = {
+        'path': 'SetPath'
+    }
+    for prop_key, wx_method in additions.items():
+        if prop_key in props:
+            getattr(instance, wx_method)(props[prop_key])
+    instance.Unbind(wx.EVT_FILEPICKER_CHANGED)
+    if props.get('on_change'):
+        instance.Bind(wx.EVT_FILEPICKER_CHANGED, props['on_change'])
+    return instance
 
 @mount.register(wx.Gauge)
 def gauge(element, parent):
