@@ -49,6 +49,15 @@ class Grid(wx.Panel):
     """
     pass
 
+class FlexGrid(wx.Panel):
+    """
+    Wrapper type for creating a Panel
+    with a FlexGridSizer
+
+    https://wxpython.org/Phoenix/docs/html/wx.FlexGridSizer.html
+    """
+    pass
+
 class Block(wx.Panel):
     """
     Wrapper type for creating a panel

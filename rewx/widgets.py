@@ -14,7 +14,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 from rewx.dispatch import mount, update
 from wx.richtext import RichTextCtrl
 import sys
-from rewx.components import Block, Grid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave
+from rewx.components import Block, Grid, FlexGrid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave
 from rewx.util import exclude
 from rewx.bitmap_support import load, resize_image, to_bitmap
 from rewx.util import identity
@@ -57,9 +57,10 @@ exclusions = {
     SVG: {'value'},
     SVGButton: {'value'},
     ScrolledPanel: {'value'},
-    wx.DirPickerCtrl: {'style'},
-    FilePickerCtrlOpen: {'style'},
-    FilePickerCtrlSave: {'style'},
+    wx.DirPickerCtrl: {'value', 'style'},
+    FilePickerCtrlOpen: {'value', 'style'},
+    FilePickerCtrlSave: {'value', 'style'},
+    FlexGrid: {'value', 'label', 'style'},
 }
 
 
@@ -776,9 +777,26 @@ def grid(element, parent):
     panel.SetSizer(sizer)
     return update(element, panel)
 
-
 @update.register(Grid)
 def grid(element, instance: Grid):
+    props = element['props']
+    set_basic_props(instance, props)
+    instance.Unbind(wx.EVT_LEFT_DOWN)
+    if 'on_click' in props:
+        instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
+    return instance
+
+
+@mount.register(FlexGrid)
+def flexgrid(element, parent):
+    props = element['props']
+    panel = FlexGrid(parent)
+    sizer = wx.FlexGridSizer(props.get('cols', 1), gap=props.get('gap', (0, 0)))
+    panel.SetSizer(sizer)
+    return update(element, panel)
+
+@update.register(FlexGrid)
+def flexgrid(element, instance: FlexGrid):
     props = element['props']
     set_basic_props(instance, props)
     instance.Unbind(wx.EVT_LEFT_DOWN)
