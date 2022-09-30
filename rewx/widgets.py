@@ -864,6 +864,7 @@ def staticbitmap(element, parent):
 @update.register(wx.StaticBitmap)
 def staticbitmap(element, instance: wx.StaticBitmap):
     props = element['props']
+    set_basic_props(instance, props)
     if props.get('uri'):
         # only load and update the image if it has changed.
         if instance._rewx_cache.get('uri', 'rewx::nothing') != props['uri']:
