@@ -412,16 +412,31 @@ def listctrl(element, instance: wx.ListCtrl):
         del props['style']
     set_basic_props(instance, props)
     # TODO: what events...?
+    restored_widths = ListCtrl_GetColumnWidths(instance)
     instance.DeleteAllColumns()
     instance.DeleteAllItems()
     for e, col in enumerate(props.get('column_defs', [])):
         instance.InsertColumn(e, col['title'])
+    ListCtrl_SetColumnWidths(instance, restored_widths)
 
     for row_idx, item in enumerate(props.get('data', [])):
         instance.InsertItem(row_idx, '')
         for col_idx, coldef in enumerate(props.get('column_defs', [])):
             instance.SetItem(row_idx, col_idx, coldef['column'](item))
     return instance
+
+def ListCtrl_GetColumnWidths(instance: wx.ListCtrl):
+    wds = []
+    for i in range(0, instance.GetColumnCount()):
+        wds.append(instance.GetColumnWidth(i))
+    return wds
+
+def ListCtrl_SetColumnWidths(instance: wx.ListCtrl, wds: list[int]): # : List[int]):
+    # no-op if the list of column widths is the wrong length
+    if len(wds) == instance.GetColumnCount():
+        for i in range(0, len(wds)):
+            instance.SetColumnWidth(i, wds[i])
+
 
 
 @mount.register(wx.media.MediaCtrl)
