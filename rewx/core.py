@@ -97,8 +97,15 @@ def patch(dom: wx.Window, vdom):
             newdom = dom
         elif isinstance(dom, vdom['type']):
             update(vdom, dom)
+            # print("VDOM")
+            # print(vdom)
+            # print ("DOM")
+            # print(dom)
             pool = {f'__index_{index}': child for index, child in enumerate(dom.GetChildren())}
             for index, child in enumerate(vdom['props'].get('children', [])):
+                # print("Child")
+                # print(str(child.__class__) + ": " + str(child.__dict__))
+                # print(child)
                 key = f'__index_{index}'
                 if key in pool:
                     patch(pool[key], child)
@@ -122,17 +129,21 @@ def patch(dom: wx.Window, vdom):
                             child['props'].get('flag', 0),
                             child['props'].get('border', 0)
                         )
-            # any keys which haven't been removed in the
-            # above loop represent wx.Objects which are no longer
-            # part of the virtualdom and should thus be removed.
-            for key, orphan in pool.items():
-                # Debugging InspectionFrame gets lumped in with the
-                # top-level hierarchy. We want to leave this alone as
-                # it's there for debugging and not part of the actual
-                # declared component tree
-                if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
-                    dom.RemoveChild(orphan)
-                    orphan.Destroy()
+            # # any keys which haven't been removed in the
+            # # above loop represent wx.Objects which are no longer
+            # # part of the virtualdom and should thus be removed.
+            # for key, orphan in pool.items():
+            #     # Debugging InspectionFrame gets lumped in with the
+            #     # top-level hierarchy. We want to leave this alone as
+            #     # it's there for debugging and not part of the actual
+            #     # declared component tree
+            #     print(str(orphan.__class__) + ": " + str(orphan.__dict__))
+            #     if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
+            #         dom.RemoveChild(orphan)
+            #         print("Destroy")
+            #         # print(orphan)
+            #         print(str(orphan.__class__) + ": " + str(orphan.__dict__))
+            #         orphan.Destroy()
 
             newdom = dom
         else:
@@ -251,8 +262,8 @@ def render(element, parent):
     else:
         # TODO: rest of this message
         raise TypeError(f'''
-            An unknown type ("{element['type']}") was supplied as a renderable 
-            element. 
+            An unknown type ("{element['type']}") was supplied as a renderable
+            element.
         ''')
 
 class Ref:
