@@ -1,7 +1,6 @@
 import threading
 import wx
 import wx.lib.inspection
-from pip._vendor.contextlib2 import contextmanager
 from unittest import TestCase
 
 from rewx import create_element, wsx, render
