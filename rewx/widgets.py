@@ -61,6 +61,8 @@ exclusions = {
     FilePickerCtrlOpen: {'value', 'style'},
     FilePickerCtrlSave: {'value', 'style'},
     FlexGrid: {'value', 'label', 'style'},
+    wx.StaticBitmap: {'value'},
+    wx.ToggleButton: {'value'},
 }
 
 
