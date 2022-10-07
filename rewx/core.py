@@ -129,21 +129,17 @@ def patch(dom: wx.Window, vdom):
                             child['props'].get('flag', 0),
                             child['props'].get('border', 0)
                         )
-            # # any keys which haven't been removed in the
-            # # above loop represent wx.Objects which are no longer
-            # # part of the virtualdom and should thus be removed.
-            # for key, orphan in pool.items():
-            #     # Debugging InspectionFrame gets lumped in with the
-            #     # top-level hierarchy. We want to leave this alone as
-            #     # it's there for debugging and not part of the actual
-            #     # declared component tree
-            #     print(str(orphan.__class__) + ": " + str(orphan.__dict__))
-            #     if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
-            #         dom.RemoveChild(orphan)
-            #         print("Destroy")
-            #         # print(orphan)
-            #         print(str(orphan.__class__) + ": " + str(orphan.__dict__))
-            #         orphan.Destroy()
+            # any keys which haven't been removed in the
+            # above loop represent wx.Objects which are no longer
+            # part of the virtualdom and should thus be removed.
+            for key, orphan in pool.items():
+                # Debugging InspectionFrame gets lumped in with the
+                # top-level hierarchy. We want to leave this alone as
+                # it's there for debugging and not part of the actual
+                # declared component tree
+                if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
+                    dom.RemoveChild(orphan)
+                    orphan.Destroy()
 
             newdom = dom
         else:
