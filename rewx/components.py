@@ -106,6 +106,9 @@ class FilePickerCtrlOpen(wx.FilePickerCtrl):
 
     https://docs.wxpython.org/wx.FilePickerCtrl.html
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.self_managed = True # creates and destroys its own children
 
 class FilePickerCtrlSave(wx.FilePickerCtrl):
     """
@@ -114,3 +117,6 @@ class FilePickerCtrlSave(wx.FilePickerCtrl):
 
     https://docs.wxpython.org/wx.FilePickerCtrl.html
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.self_managed = True # creates and destroys its own children

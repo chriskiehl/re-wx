@@ -279,7 +279,9 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 
 @mount.register(wx.DirPickerCtrl)
 def dir_picker_ctrl(element, parent):
-    return update(element, wx.DirPickerCtrl(parent))
+    instance = wx.DirPickerCtrl(parent)
+    instance.self_managed = True # DirPickerCtrl has a self-managed Button child.
+    return update(element, instance)
 
 @update.register(wx.DirPickerCtrl)
 def dir_picker_ctrl(element, instance: wx.DirPickerCtrl):
@@ -405,7 +407,9 @@ def listbox(element, instance: wx.ListBox):
 
 @mount.register(wx.ListCtrl)
 def listctrl(element, parent):
-    return update(element, wx.ListCtrl(parent, style=wx.LC_REPORT))
+    instance = wx.ListCtrl(parent, style=wx.LC_REPORT)
+    instance.self_managed = True
+    return update(element, instance)
 
 @update.register(wx.ListCtrl)
 def listctrl(element, instance: wx.ListCtrl):
