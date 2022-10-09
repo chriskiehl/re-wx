@@ -97,15 +97,8 @@ def patch(dom: wx.Window, vdom):
             newdom = dom
         elif isinstance(dom, vdom['type']):
             update(vdom, dom)
-            # print("VDOM")
-            # print(vdom)
-            # print ("DOM")
-            # print(dom)
             pool = {f'__index_{index}': child for index, child in enumerate(dom.GetChildren())}
             for index, child in enumerate(vdom['props'].get('children', [])):
-                # print("Child")
-                # print(str(child.__class__) + ": " + str(child.__dict__))
-                # print(child)
                 key = f'__index_{index}'
                 if key in pool:
                     patch(pool[key], child)
