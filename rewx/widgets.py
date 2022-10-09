@@ -764,6 +764,9 @@ def block(element, instance: Block):
     instance.Unbind(wx.EVT_LEFT_DOWN)
     if 'on_click' in props:
         instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
+    instance.Unbind(wx.EVT_SIZE)
+    if 'on_size' in props:
+        instance.Bind(wx.EVT_SIZE, props['on_size'])
     return instance
 
 
