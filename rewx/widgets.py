@@ -591,7 +591,7 @@ def spinctrl(element, instance: wx.SpinCtrl):
     instance.SetMin(props.get('min', 0))
     instance.Unbind(wx.EVT_SPINCTRL)
     if 'on_change' in props:
-        instance.Bind(wx.EVT_SLIDER, props['on_change'])
+        instance.Bind(wx.EVT_SPINCTRL, props['on_change'])
     return instance
 
 
@@ -795,6 +795,7 @@ def scrolledpanel(element, instance: ScrolledPanel):
     # Restore the scroll position from before the update
     if hasattr(instance, 'last_scroll_pos'):
         if instance.last_scroll_pos:
+            # This works but it flickers because the widgets aren't frozen.
             wx.CallAfter(instance.Scroll, instance.last_scroll_pos)
     instance.Unbind(wx.EVT_LEFT_DOWN)
     if 'on_click' in props:
