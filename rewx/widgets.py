@@ -63,6 +63,7 @@ exclusions = {
     FlexGrid: {'value', 'label', 'style'},
     wx.StaticBitmap: {'value'},
     wx.ToggleButton: {'value'},
+    wx.ComboBox: {'style'},
 }
 
 
@@ -248,7 +249,11 @@ def collapsiblepanel(element, instance: wx.CollapsiblePane):
 
 @mount.register(wx.ComboBox)
 def combobox(element, parent):
-    return update(element, wx.ComboBox(parent, choices=element['props'].get('choices', [])))
+    props = element['props']
+    return update(
+        element,
+        wx.ComboBox(parent, choices=props.get('choices', []), style=props.get('style', 0))
+        )
 
 @update.register(wx.ComboBox)
 def combobox(element, instance: wx.ComboBox) -> wx.Object:
@@ -267,7 +272,7 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
     for _ in instance.GetItems():
         instance.Delete(0)
     instance.AppendItems(props.get('choices', []))
-    if 'value' in props:
+    if 'value' in element['props']:
         instance.SetSelection(props['choices'].index(element['props'].get('value')))
 
     if props.get('on_change'):
