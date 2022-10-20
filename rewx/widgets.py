@@ -603,7 +603,9 @@ def spinctrl(element, instance: wx.SpinCtrl):
 
 @mount.register(wx.SpinCtrlDouble)
 def spinctrldouble(element, parent):
-    return update(element, wx.SpinCtrlDouble(parent))
+    instance = wx.SpinCtrlDouble(parent)
+    instance.self_managed = True # SpinCtrlDouble has a self-managed child.
+    return update(element, instance)
 
 @update.register(wx.SpinCtrlDouble)
 def spinctrldouble(element, instance: wx.SpinCtrlDouble):
@@ -614,9 +616,9 @@ def spinctrldouble(element, instance: wx.SpinCtrlDouble):
     instance.SetIncrement(props.get('increment', 0))
     if 'digits' in props:
         instance.SetDigits(props['digits'])
-    instance.Unbind(wx.EVT_SPINCTRL)
+    instance.Unbind(wx.EVT_SPINCTRLDOUBLE)
     if 'on_change' in props:
-        instance.Bind(wx.EVT_SPINCTRL, props['on_change'])
+        instance.Bind(wx.EVT_SPINCTRLDOUBLE, props['on_change'])
     return instance
 
 
