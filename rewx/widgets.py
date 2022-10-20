@@ -324,7 +324,8 @@ def file_picker_ctrl_open(element, instance: FilePickerCtrlOpen):
 
 @mount.register(FilePickerCtrlSave)
 def file_picker_ctrl_save(element, parent):
-    return update(element, FilePickerCtrlSave(parent, style=wx.FLP_SAVE))
+    props = element['props']
+    return update(element, FilePickerCtrlSave(parent, style=wx.FLP_SAVE, wildcard=props.get('wildcard', '*.*')))
 
 @update.register(FilePickerCtrlSave)
 def file_picker_ctrl_save(element, instance: FilePickerCtrlSave):
