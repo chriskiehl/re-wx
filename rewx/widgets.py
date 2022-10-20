@@ -616,7 +616,7 @@ def spinctrldouble(element, instance: wx.SpinCtrlDouble):
         instance.SetDigits(props['digits'])
     instance.Unbind(wx.EVT_SPINCTRL)
     if 'on_change' in props:
-        instance.Bind(wx.EVT_SLIDER, props['on_change'])
+        instance.Bind(wx.EVT_SPINCTRL, props['on_change'])
     return instance
 
 
