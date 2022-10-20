@@ -784,27 +784,22 @@ def scrolledpanel(element, parent):
     panel = update(element, ScrolledPanel(parent))
     sizer = wx.BoxSizer(element['props'].get('orient', wx.VERTICAL))
     panel.SetSizer(sizer)
-    panel.last_scroll_pos = None
-    def handle_scroll(event):
-        # Save the scroll position so that it can be restored after update
-        panel.last_scroll_pos = panel.GetViewStart()
-        event.Skip() # Propagate this event
-    panel.Bind(wx.EVT_SCROLLWIN, handle_scroll)
     return panel
 
 @update.register(ScrolledPanel)
 def scrolledpanel(element, instance: ScrolledPanel):
     props = element['props']
     set_basic_props(instance, props)
-    instance.SetupScrolling(
-        scroll_x=props.get('scroll_x', False),
-        scroll_y=props.get('scroll_y', False)
-    )
-    # Restore the scroll position from before the update
-    if hasattr(instance, 'last_scroll_pos'):
-        if instance.last_scroll_pos:
-            # This works but it flickers because the widgets aren't frozen.
-            wx.CallAfter(instance.Scroll, instance.last_scroll_pos)
+    scroll_x=props.get('scroll_x', False)
+    scroll_y=props.get('scroll_y', False)
+    # Only call SetupScrolling if the props changed.
+    if not hasattr(instance, 'last_scroll_x') or instance.last_scroll_x != scroll_x or not hasattr(instance, 'last_scroll_y') or instance.last_scroll_y != scroll_y:
+        instance.SetupScrolling(
+            scroll_x=scroll_x,
+            scroll_y=scroll_y
+        )
+    instance.last_scroll_x=scroll_x
+    instance.last_scroll_y=scroll_y
     instance.Unbind(wx.EVT_LEFT_DOWN)
     if 'on_click' in props:
         instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
