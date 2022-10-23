@@ -10,11 +10,10 @@ import wx.html2
 import wx.svg
 # TODO: warn on unknown props?
 import os
-from wx.lib.scrolledpanel import ScrolledPanel
 from rewx.dispatch import mount, update
 from wx.richtext import RichTextCtrl
 import sys
-from rewx.components import Block, Grid, FlexGrid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave
+from rewx.components import Block, Grid, FlexGrid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave, ScrolledPanel
 from rewx.util import exclude
 from rewx.bitmap_support import load, resize_image, to_bitmap
 from rewx.util import identity

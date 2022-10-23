@@ -26,7 +26,6 @@ ListCtrl = wx.ListCtrl
 Panel = wx.Panel
 RadioBox = wx.RadioBox
 RadioButton = wx.RadioButton
-ScrolledPanel = wx.lib.scrolledpanel.ScrolledPanel
 Slider = wx.Slider
 SpinCtrl = wx.SpinCtrl
 SpinCtrlDouble = wx.SpinCtrlDouble
@@ -120,3 +119,14 @@ class FilePickerCtrlSave(wx.FilePickerCtrl):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.self_managed = True # creates and destroys its own children
+
+class ScrolledPanel(wx.lib.scrolledpanel.ScrolledPanel):
+    """
+    Wrapper for a ScrolledPanel which doesn't jump the scroll on focus.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    # https://discuss.wxpython.org/t/prevent-scrolledpanel-scrolling-to-a-widget-that-has-focus/27257
+    def OnChildFocus(self, event):
+        pass
