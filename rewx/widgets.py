@@ -140,13 +140,16 @@ def button(element, parent):
 def button(element, instance: wx.Button):
     props = element['props']
     set_basic_props(instance, props)
-    if props.get('enabled') is False:
-        # we navigate away from the control when disabling.
-        # Without this, under conditions where the button gets
-        # disabled / re-enabled quickly, wx will still feed events
-        # spawned while it was disable to the now recently enabled
-        # button. This behavior doesn't happen if we navigate away
-        instance.Navigate()
+    # Removed this behavior because I don't want it, and it causes a problem
+    # because the Button grabs focus on every render when disabled.
+    #
+    # if props.get('enabled') is False:
+    #     # we navigate away from the control when disabling.
+    #     # Without this, under conditions where the button gets
+    #     # disabled / re-enabled quickly, wx will still feed events
+    #     # spawned while it was disable to the now recently enabled
+    #     # button. This behavior doesn't happen if we navigate away
+    #     instance.Navigate()
     instance.Unbind(wx.EVT_BUTTON)
     if props.get('on_click'):
         instance.Bind(wx.EVT_BUTTON, props['on_click'])
