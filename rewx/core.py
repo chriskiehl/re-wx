@@ -5,6 +5,7 @@ import functools
 from threading import Lock
 
 import wx
+import wx.lib.inspection # Needed for the orphan remover
 from inspect import isclass
 
 from rewx.dispatch import mount, update
