@@ -19,7 +19,9 @@ update.merge_registries(_update._registry)
 
 def wsx(f):
     def convert(spec: list):
-        type, props, *children = spec
+        type = spec[0]
+        props = spec[1]
+        children = spec[2:]
         return create_element(type, props, children=list(map(convert, children)))
     # being used as a decorator
     if callable(f):
