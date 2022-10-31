@@ -2,6 +2,7 @@
 This module contains all of the mount/update
 functions for re-wx's supported widget types.
 """
+from operator import attrgetter
 import wx
 import wx.adv
 import wx.media
@@ -73,11 +74,10 @@ def set_basic_props(instance, props):
     for key, val in props.items():
         if key.startswith('on_'):
             continue
-        try:
-            getattr(instance, available_controls[key])(val)
-        except KeyError:
-            # prop which doesn't apply to this control
-            pass
+        if key in available_controls:
+            setter_name = available_controls[key]
+            if hasattr(instance, setter_name):
+                getattr(instance, setter_name)(val)
     return instance
 
 
@@ -286,6 +286,8 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 
 @mount.register(wx.DirPickerCtrl)
 def dir_picker_ctrl(element, parent):
+    # TODO make this a drop target
+    # https://www.blog.pythonlibrary.org/2012/06/20/wxpython-introduction-to-drag-and-drop/
     instance = wx.DirPickerCtrl(parent)
     instance.self_managed = True # DirPickerCtrl has a self-managed Button child.
     return update(element, instance)
