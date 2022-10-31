@@ -123,6 +123,15 @@ class FilePickerCtrlSave(wx.FilePickerCtrl):
 class DirPickerCtrl(wx.DirPickerCtrl):
     """
     Wrapper for a `DirPickerCtrl` with a `FileDropTarget`.
+
+    Extra Props
+    ```
+    {
+      text_font: wx.Font,
+      on_change: (event:FileDirPickerEvent),
+      on_dropdir: (x:int, y:int, path:str),
+    }
+    ```
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
