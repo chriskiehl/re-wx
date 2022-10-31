@@ -150,6 +150,8 @@ def button(element, instance: wx.Button):
     #     # spawned while it was disable to the now recently enabled
     #     # button. This behavior doesn't happen if we navigate away
     #     instance.Navigate()
+    if 'label_markup' in props:
+        instance.SetLabelMarkup(props['label_markup'])
     instance.Unbind(wx.EVT_BUTTON)
     if props.get('on_click'):
         instance.Bind(wx.EVT_BUTTON, props['on_click'])
