@@ -133,8 +133,7 @@ def activity_indicator(element, instance: wx.ActivityIndicator):
 
 @mount.register(wx.Button)
 def button(element, parent):
-    default_style = 0
-    return update(element, wx.Button(parent, element['props'].get('style', default_style)))
+    return update(element, wx.Button(parent, style=element['props'].get('style', 0)))
 
 
 @update.register(wx.Button)
