@@ -290,12 +290,18 @@ class DirPickerDropTarget(wx.FileDropTarget):
     """
     We are required to inherit from wx.FileDropTarget
     """
-    def __init__(self, on_dropfile, *args, **kwargs):
+    def __init__(self, on_dropdir, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.on_dropfile = on_dropfile
+        self.on_dropdir = on_dropdir
     def OnDropFiles(self, x:int, y:int, filenames:list[str]):
-        self.on_dropfile(x,y,filenames)
-        return True
+        if len(filenames) == 1:
+            path = filenames[0]
+            if os.path.isdir(path):
+                self.on_dropdir(x,y,path)
+                return True # wx.DragCopy?
+        return False # wx.DragNone?
+    def OnDragOver(self, x:int, y:int, defResult):
+        return wx.DragCopy
 
 @mount.register(DirPickerCtrl)
 def dir_picker_ctrl(element, parent):
@@ -319,8 +325,8 @@ def dir_picker_ctrl(element, instance: DirPickerCtrl):
     instance.Unbind(wx.EVT_DIRPICKER_CHANGED)
     if 'on_change' in props:
         instance.Bind(wx.EVT_DIRPICKER_CHANGED, props['on_change'])
-    if 'on_dropfile' in props:
-        droptarget = DirPickerDropTarget(props['on_dropfile'])
+    if 'on_dropdir' in props:
+        droptarget = DirPickerDropTarget(props['on_dropdir'])
         # https://docs.wxpython.org/wx.FileDropTarget.html
         instance.SetDropTarget(droptarget)
     return instance
