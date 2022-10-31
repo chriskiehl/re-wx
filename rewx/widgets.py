@@ -296,6 +296,10 @@ def dir_picker_ctrl(element, parent):
 def dir_picker_ctrl(element, instance: wx.DirPickerCtrl):
     props = element['props']
     set_basic_props(instance, props)
+    if instance.HasTextCtrl():
+        textctrl = instance.GetTextCtrl()
+        if 'text_font' in props:
+            textctrl.SetFont(props['text_font'])
     additions = {
         'path': 'SetPath'
     }
