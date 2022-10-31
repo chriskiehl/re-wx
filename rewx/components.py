@@ -111,7 +111,7 @@ class FilePickerCtrlOpen(wx.FilePickerCtrl):
 
 class FilePickerCtrlSave(wx.FilePickerCtrl):
     """
-    Wrapper for a FilePickerCtrl with style
+    Wrapper for a `FilePickerCtrl` with style
     `wx.FLP_SAVE`
 
     https://docs.wxpython.org/wx.FilePickerCtrl.html
@@ -120,9 +120,17 @@ class FilePickerCtrlSave(wx.FilePickerCtrl):
         super().__init__(*args, **kwargs)
         self.self_managed = True # creates and destroys its own children
 
+class DirPickerCtrl(wx.DirPickerCtrl):
+    """
+    Wrapper for a `DirPickerCtrl` with a `FileDropTarget`.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.self_managed = True # creates and destroys its own children
+
 class ScrolledPanel(wx.lib.scrolledpanel.ScrolledPanel):
     """
-    Wrapper for a ScrolledPanel which doesn't jump the scroll on focus.
+    Wrapper for a `ScrolledPanel` which doesn't jump the scroll on focus.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
