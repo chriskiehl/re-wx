@@ -14,7 +14,7 @@ import os
 from rewx.dispatch import mount, update
 from wx.richtext import RichTextCtrl
 import sys
-from rewx.components import Block, Grid, FlexGrid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave, ScrolledPanel
+from rewx.components import Block, Grid, FlexGrid, TextArea, SVG, SVGButton, NotebookItem, FilePickerCtrlOpen, FilePickerCtrlSave, DirPickerCtrl, ScrolledPanel
 from rewx.util import exclude
 from rewx.bitmap_support import load, resize_image, to_bitmap
 from rewx.util import identity
@@ -57,7 +57,7 @@ exclusions = {
     SVG: {'value'},
     SVGButton: {'value'},
     ScrolledPanel: {'value'},
-    wx.DirPickerCtrl: {'value', 'style'},
+    DirPickerCtrl: {'value', 'style'},
     FilePickerCtrlOpen: {'value', 'style'},
     FilePickerCtrlSave: {'value', 'style'},
     FlexGrid: {'value', 'label', 'style'},
@@ -286,16 +286,24 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
 
     return instance
 
-@mount.register(wx.DirPickerCtrl)
+class DirPickerDropTarget(wx.FileDropTarget):
+    """
+    We are required to inherit from wx.FileDropTarget
+    """
+    def __init__(self, on_dropfile, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.on_dropfile = on_dropfile
+    def OnDropFiles(self, x:int, y:int, filenames:list[str]):
+        self.on_dropfile(x,y,filenames)
+        return True
+
+@mount.register(DirPickerCtrl)
 def dir_picker_ctrl(element, parent):
-    # TODO make this a drop target
-    # https://www.blog.pythonlibrary.org/2012/06/20/wxpython-introduction-to-drag-and-drop/
-    instance = wx.DirPickerCtrl(parent)
-    instance.self_managed = True # DirPickerCtrl has a self-managed Button child.
+    instance = DirPickerCtrl(parent)
     return update(element, instance)
 
-@update.register(wx.DirPickerCtrl)
-def dir_picker_ctrl(element, instance: wx.DirPickerCtrl):
+@update.register(DirPickerCtrl)
+def dir_picker_ctrl(element, instance: DirPickerCtrl):
     props = element['props']
     set_basic_props(instance, props)
     if instance.HasTextCtrl():
@@ -309,8 +317,12 @@ def dir_picker_ctrl(element, instance: wx.DirPickerCtrl):
         if prop_key in props:
             getattr(instance, wx_method)(props[prop_key])
     instance.Unbind(wx.EVT_DIRPICKER_CHANGED)
-    if props.get('on_change'):
+    if 'on_change' in props:
         instance.Bind(wx.EVT_DIRPICKER_CHANGED, props['on_change'])
+    if 'on_dropfile' in props:
+        droptarget = DirPickerDropTarget(props['on_dropfile'])
+        # https://docs.wxpython.org/wx.FileDropTarget.html
+        instance.SetDropTarget(droptarget)
     return instance
 
 @mount.register(FilePickerCtrlOpen)
