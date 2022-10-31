@@ -1080,7 +1080,7 @@ Displays a Horizontal or Vertical line.
 ```python
 def example(props):
     return wsx(
-      [c.StaticLine, {'style': wx.SL_HORIZONTAL, 'proportion': 1}]
+      [c.StaticLine, {'style': wx.LI_HORIZONTAL, 'flag': wx.EXPAND}]
     )
 ```
 
@@ -1090,7 +1090,7 @@ def example(props):
 
 | key | Type | Description | 
 |------|------|---------|
-|style | str | Text to display at the top of the box | 
+|style | str | [Style flags](https://docs.wxpython.org/wx.StaticLine.html#styles-window-styles) | 
 |background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
 |foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
 |name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
