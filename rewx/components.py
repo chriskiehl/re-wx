@@ -122,20 +122,24 @@ class FilePickerCtrlSave(wx.FilePickerCtrl):
 
 class DirPickerCtrl(wx.DirPickerCtrl):
     """
-    Wrapper for a `DirPickerCtrl` with a `FileDropTarget`.
+    Wrapper for a `DirPickerCtrl` (with a `FileDropTarget` for MS Windows).
 
     Extra Props
     ```
     {
       text_font: wx.Font,
-      on_change: (event:FileDirPickerEvent),
-      on_dropdir: (x:int, y:int, path:str),
+      on_change: (path:str):None
     }
     ```
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.self_managed = True # creates and destroys its own children
+    
+    def _on_change_impl(self, event:wx.FileDirPickerEvent):
+        if hasattr(self, '_on_change'):
+            self._on_change(event.GetPath())
+
 
 class ScrolledPanel(wx.lib.scrolledpanel.ScrolledPanel):
     """

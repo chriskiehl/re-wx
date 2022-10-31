@@ -11,6 +11,7 @@ import wx.html2
 import wx.svg
 # TODO: warn on unknown props?
 import os
+import weakref
 from rewx.dispatch import mount, update
 from wx.richtext import RichTextCtrl
 import sys
@@ -290,15 +291,18 @@ class DirPickerDropTarget(wx.FileDropTarget):
     """
     We are required to inherit from wx.FileDropTarget
     """
-    def __init__(self, on_dropdir, *args, **kwargs):
+    def __init__(self, dirPickerCtrl, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.on_dropdir = on_dropdir
+        self.dirPickerCtrl = dirPickerCtrl 
     def OnDropFiles(self, x:int, y:int, filenames:list[str]):
         if len(filenames) == 1:
             path = filenames[0]
             if os.path.isdir(path):
-                self.on_dropdir(x,y,path)
-                return True # wx.DragCopy?
+                dpc = self.dirPickerCtrl()
+                if dpc is not None:
+                    if hasattr(dpc, '_on_change'):
+                        dpc._on_change(path)
+                        return True # wx.DragCopy?
         return False # wx.DragNone?
     def OnDragOver(self, x:int, y:int, defResult):
         return wx.DragCopy
@@ -306,6 +310,11 @@ class DirPickerDropTarget(wx.FileDropTarget):
 @mount.register(DirPickerCtrl)
 def dir_picker_ctrl(element, parent):
     instance = DirPickerCtrl(parent)
+    # TODO We only need this droptarget in Microsoft Windows.
+    # In Linux this is handled automatically.
+    # https://docs.wxpython.org/wx.FileDropTarget.html
+    instance.droptarget = DirPickerDropTarget(weakref.ref(instance))
+    instance.SetDropTarget(instance.droptarget)
     return update(element, instance)
 
 @update.register(DirPickerCtrl)
@@ -324,11 +333,11 @@ def dir_picker_ctrl(element, instance: DirPickerCtrl):
             getattr(instance, wx_method)(props[prop_key])
     instance.Unbind(wx.EVT_DIRPICKER_CHANGED)
     if 'on_change' in props:
-        instance.Bind(wx.EVT_DIRPICKER_CHANGED, props['on_change'])
-    if 'on_dropdir' in props:
-        droptarget = DirPickerDropTarget(props['on_dropdir'])
-        # https://docs.wxpython.org/wx.FileDropTarget.html
-        instance.SetDropTarget(droptarget)
+        instance._on_change = props['on_change']
+        instance.Bind(wx.EVT_DIRPICKER_CHANGED, instance._on_change_impl)
+    else:
+        if hasattr(instance, '_on_change'):
+            delattr(instance, '_on_change')
     return instance
 
 @mount.register(FilePickerCtrlOpen)
