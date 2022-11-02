@@ -66,7 +66,10 @@ def updatewx(instance, props):
     return instance
 
 
-def patch(dom: wx.Window, vdom):
+def patch(dom: wx.Window, vdom) -> wx.Window:
+    """
+    Diffing and reconciliation.
+    """
     parent = dom.GetParent()
     try:
         # if parent:
@@ -81,10 +84,7 @@ def patch(dom: wx.Window, vdom):
         if isclass(vdom['type']) and issubclass(vdom['type'], Component):
             return Component.patch_component(dom, vdom)
         elif not isinstance(dom, vdom['type']):
-            for child in dom.GetChildren():
-                dom.RemoveChild(child)
-                child.Destroy()
-            dom.Destroy()
+            # Create a new dom Window. The old dom Window will be Destroy()ed by reconciliation.
             newdom = render(vdom, parent)
         elif isinstance(dom, vdom['type']) and getattr(dom, 'self_managed', False):
             # self-managed components manage their children by hand rather than
@@ -100,42 +100,104 @@ def patch(dom: wx.Window, vdom):
             newdom = dom
         elif isinstance(dom, vdom['type']):
             update(vdom, dom)
-            pool = {f'__index_{index}': child for index, child in enumerate(dom.GetChildren())}
-            for index, child in enumerate(vdom['props'].get('children', [])):
-                key = f'__index_{index}'
-                if key in pool:
-                    patch(pool[key], child)
-                    del pool[key]
-                else:
-                    # TODO: this IS the addition case, right?
-                    # why would I need this removeChild line..?
+            # We have to treat Windows with Sizers differently from Windows without Sizers.
+            # The problem is that Sizer.Insert() puts the child in the position in the Sizer,
+            # but the child gets appended to the dom.GetChildren() list.
+            # So then the vdom and the dom.GetChildren() disagree.
+            sizer = dom.GetSizer()
+            if sizer is None:
+                pool = {f'__index_{index}': child for index, child in enumerate(dom.GetChildren())}
+                for index, child in enumerate(vdom['props'].get('children', [])):
+                    key = f'__index_{index}'
                     if key in pool:
-                        # if we're adding something new to the
-                        # tree, it won't be present in the pool
-                        parent.RemoveChild(pool[key])
-                    # TODO: need to understand this case more
-                    # if we're not updating, we're adding
-                    # in which case.. why doesn't this fall to the
-                    # `dom` instance..?
-                    inst = render(child, dom)
-                    if dom.GetSizer():
-                        dom.GetSizer().Add(
+                        domchild = pool[key]
+                        # patch will attempt to update in place. If successful, domchild is returned.
+                        # Maybe patch returns a different domchild, possibly a different type of domchild.
+                        newdomchild = patch(domchild, child)
+                        if newdomchild is not domchild:
+                            # TODO
+                            # If the Window doesn't have a Sizer, we can only append children.
+                            # This child will be positioned incorrectly.
+                            #
+                            # Currently the Frame doesn't have a Sizer.
+                            #
+                            # Maybe we should require that all Windows which can have children
+                            # must have a Sizer.
+                            domchild.Destroy()
+                            dom.AddChild(
+                                newdomchild,
+                                child['props'].get('proportion', 0),
+                                child['props'].get('flag', 0),
+                                child['props'].get('border', 0)
+                            )
+                        del pool[key]
+                    else:
+                        inst = render(child, dom)
+                        dom.AddChild(
                             inst,
                             child['props'].get('proportion', 0),
                             child['props'].get('flag', 0),
                             child['props'].get('border', 0)
                         )
-            # any keys which haven't been removed in the
-            # above loop represent wx.Objects which are no longer
-            # part of the virtualdom and should thus be removed.
-            for key, orphan in pool.items():
-                # Debugging InspectionFrame gets lumped in with the
-                # top-level hierarchy. We want to leave this alone as
-                # it's there for debugging and not part of the actual
-                # declared component tree
-                if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
-                    dom.RemoveChild(orphan)
-                    orphan.Destroy()
+                # any keys which haven't been removed in the
+                # above loop represent wx.Objects which are no longer
+                # part of the virtualdom and should thus be removed.
+                for key, orphan in pool.items():
+                    # Debugging InspectionFrame gets lumped in with the
+                    # top-level hierarchy. We want to leave this alone as
+                    # it's there for debugging and not part of the actual
+                    # declared component tree
+                    if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
+                        orphan.Destroy()
+            else: # This dom Window has a Sizer
+                # TODO What about child items which are not Window, instead are Sizer or Spacer?
+                pool = {f'__index_{index}': child.GetWindow() for index, child in enumerate(sizer.GetChildren())}
+                for index, child in enumerate(vdom['props'].get('children', [])):
+                    # TODO 'key' props like in React.
+                    #       Otherwise inserting a new child or deleting a child causes all the later
+                    #       children to be re-rendered.
+                    key = f'__index_{index}'
+                    if key in pool:
+                        domchild = pool[key]
+                        # patch will attempt to update in place. If successful, domchild is returned.
+                        # Maybe patch returns a different domchild, possibly a different type of domchild.
+                        newdomchild = patch(domchild, child)
+                        if newdomchild is not domchild:
+                            childrenbefore = sizer.GetItemCount()
+                            # Only a Sizer can Insert() at a position.
+                            domchild.Destroy()
+                            sizer.Insert(
+                                index,
+                                newdomchild,
+                                child['props'].get('proportion', 0),
+                                child['props'].get('flag', 0),
+                                child['props'].get('border', 0)
+                            )
+                            childrenafter = sizer.GetItemCount()
+                            # We can't use
+                            # https://docs.wxpython.org/wx.Sizer.html#wx.Sizer.Replace
+                            # because it doesn't allow us to set proportion, flag, border.
+                        del pool[key]
+                    else:
+                        # If we're not updating, we're appending to the end of the children list.
+                        inst = render(child, dom)
+                        sizer.Add(
+                            inst,
+                            child['props'].get('proportion', 0),
+                            child['props'].get('flag', 0),
+                            child['props'].get('border', 0)
+                        )
+                # any keys which haven't been removed in the
+                # above loop represent wx.Objects which are no longer
+                # part of the virtualdom and should thus be removed.
+                # TODO What about items which are not Window, instead are Sizer or Spacer?
+                for key, orphan in pool.items():
+                    # Debugging InspectionFrame gets lumped in with the
+                    # top-level hierarchy. We want to leave this alone as
+                    # it's there for debugging and not part of the actual
+                    # declared component tree
+                    if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
+                        orphan.Destroy()
 
             newdom = dom
         else:
@@ -218,7 +280,10 @@ class Component:
 def isfunction(element):
     return callable(element['type']) and not isclass(element['type'])
 
-def render(element, parent):
+def render(element, parent:wx.Window) -> wx.Window:
+    """
+    Create a new dom Window and mount it for the first time.
+    """
     if isclass(element['type']) and issubclass(element['type'], wx.Object):
         instance = mount(element, parent)
         if element['props'].get('ref'):
