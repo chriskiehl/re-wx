@@ -198,14 +198,12 @@ def patch(dom: wx.Window, vdom) -> wx.Window:
                     # declared component tree
                     if not isinstance(orphan, wx.lib.inspection.InspectionFrame):
                         orphan.Destroy()
+                # https://docs.wxpython.org/wx.Window.html#wx.Window.Layout
+                dom.Layout()
 
             newdom = dom
         else:
             raise Exception("unexpected case!")
-        p = parent
-        while p:
-            p.Layout()
-            p = p.GetParent()
         return newdom
     finally:
         # TODO: we sometimes call parent.Thaw() when
