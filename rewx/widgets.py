@@ -826,22 +826,47 @@ def scrolledpanel(element, parent):
 def scrolledpanel(element, instance: ScrolledPanel):
     props = element['props']
     set_basic_props(instance, props)
-    scroll_x=props.get('scroll_x', False)
-    scroll_y=props.get('scroll_y', False)
     # Only call SetupScrolling if the props changed.
-    if not hasattr(instance, 'last_scroll_x') or instance.last_scroll_x != scroll_x or not hasattr(instance, 'last_scroll_y') or instance.last_scroll_y != scroll_y:
+    # https://docs.wxpython.org/wx.lib.scrolledpanel.ScrolledPanel.html#wx.lib.scrolledpanel.ScrolledPanel.SetupScrolling
+    # https://github.com/wxWidgets/Phoenix/blob/de0a4415c05e7483b2960c6dc9720154269244a8/wx/lib/scrolledpanel.py#L120
+    scroll_x = props.get('scroll_x', False)
+    scroll_y = props.get('scroll_y', False)
+    rate_x = props.get('rate_x', 20)
+    rate_y = props.get('rate_y', 20)
+    if (not hasattr(instance, 'last_scroll_x')
+        or instance.last_scroll_x != scroll_x
+        or not hasattr(instance, 'last_scroll_y')
+        or instance.last_scroll_y != scroll_y
+        or not hasattr(instance, 'last_rate_x')
+        or instance.last_rate_x != rate_x
+        or not hasattr(instance, 'last_rate_y')
+        or instance.last_rate_y != rate_y
+        ):
         instance.SetupScrolling(
             scroll_x=scroll_x,
-            scroll_y=scroll_y
+            scroll_y=scroll_y,
+            rate_x=rate_x,
+            rate_y=rate_y
         )
-    instance.last_scroll_x=scroll_x
-    instance.last_scroll_y=scroll_y
+    instance.last_scroll_x = scroll_x
+    instance.last_scroll_y = scroll_y
+    instance.last_rate_x = rate_x
+    instance.last_rate_y = rate_y
     instance.Unbind(wx.EVT_LEFT_DOWN)
     if 'on_click' in props:
         instance.Bind(wx.EVT_LEFT_DOWN, props['on_click'])
     instance.Unbind(wx.EVT_SIZE)
     if 'on_size' in props:
         instance.Bind(wx.EVT_SIZE, props['on_size'])
+    instance.Unbind(wx.EVT_MOTION)
+    if 'on_mouse_motion' in props:
+        instance.Bind(wx.EVT_MOTION, props['on_mouse_motion'])
+    instance.Unbind(wx.EVT_MOUSEWHEEL)
+    if 'on_mouse_wheel' in props:
+        instance.Bind(wx.EVT_MOUSEWHEEL, props['on_mouse_wheel'])
+    instance.Unbind(wx.EVT_SCROLLWIN)
+    if 'on_scrollwin' in props:
+        instance.Bind(wx.EVT_SCROLLWIN, props['on_scrollwin'])
     return instance
 
 
