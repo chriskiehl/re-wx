@@ -933,6 +933,12 @@ def textctrl(element, instance: wx.TextCtrl):
     instance.Unbind(wx.EVT_TEXT)
     if 'on_change' in props:
         instance.Bind(wx.EVT_TEXT, props['on_change'])
+    instance.Unbind(wx.EVT_SET_FOCUS)
+    if 'on_focus_set' in props:
+        instance.Bind(wx.EVT_SET_FOCUS, props['on_focus_set'])
+    instance.Unbind(wx.EVT_KILL_FOCUS)
+    if 'on_focus_kill' in props:
+        instance.Bind(wx.EVT_KILL_FOCUS, props['on_focus_kill'])
     return instance
 
 
