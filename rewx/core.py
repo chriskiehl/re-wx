@@ -163,7 +163,6 @@ def patch(dom: wx.Window, vdom) -> wx.Window:
                         # Maybe patch returns a different domchild, possibly a different type of domchild.
                         newdomchild = patch(domchild, child)
                         if newdomchild is not domchild:
-                            childrenbefore = sizer.GetItemCount()
                             # Only a Sizer can Insert() at a position.
                             domchild.Destroy()
                             sizer.Insert(
@@ -173,7 +172,6 @@ def patch(dom: wx.Window, vdom) -> wx.Window:
                                 child['props'].get('flag', 0),
                                 child['props'].get('border', 0)
                             )
-                            childrenafter = sizer.GetItemCount()
                             # We can't use
                             # https://docs.wxpython.org/wx.Sizer.html#wx.Sizer.Replace
                             # because it doesn't allow us to set proportion, flag, border.
