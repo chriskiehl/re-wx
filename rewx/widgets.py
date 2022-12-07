@@ -939,6 +939,9 @@ def textctrl(element, instance: wx.TextCtrl):
     instance.Unbind(wx.EVT_KILL_FOCUS)
     if 'on_focus_kill' in props:
         instance.Bind(wx.EVT_KILL_FOCUS, props['on_focus_kill'])
+    instance.Unbind(wx.EVT_KEY_DOWN)
+    if 'on_key_down' in props:
+        instance.Bind(wx.EVT_KEY_DOWN, props['on_key_down'])
     return instance
 
 
