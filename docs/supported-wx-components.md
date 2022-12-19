@@ -32,7 +32,11 @@ def my_stuff(props):
  * [CheckBox](#CheckBox)
  * [CollapsiblePane](#CollapsiblePane)
  * [ComboBox](#ComboBox)
+ * [DirPickerCtrl](#DirPickerCtrl)
  * [Dropdown](#ComboBox)
+ * [FilePickerCtrlOpen](#FilePickerCtrlOpen)
+ * [FilePickerCtrlSave](#FilePickerCtrlSave)
+ * [FlexGrid](#FlexGrid)
  * [Frame](#Frame)
  * [Gauge](#Gauge)
  * [Grid](#Grid)
@@ -44,6 +48,7 @@ def my_stuff(props):
  * [Panel](#Panel)
  * [RadioBox](#RadioBox)
  * [RadioButton](#RadioButton)
+ * [ScrolledPanel](#ScrolledPanel)
  * [Slider](#Slider)
  * [SpinCtrl](#SpinCtrl)
  * [SpinCtrlDouble](#SpinCtrlDouble)
@@ -137,6 +142,7 @@ def example(props):
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
 |on_click | callable | Calls the supplied function when this element is click. |
+|on_size | callable | Called when the size of the window changes.
 
 
 <br/>
@@ -149,7 +155,7 @@ def example(props):
 </p>
 
 
-Your basic button.
+Your basic [`wx.Button`](https://docs.wxpython.org/wx.Button.html).
 
 **Example:**
 
@@ -158,12 +164,13 @@ def button_example(props):
     return create_element(Button, {'label': 'Click me!', 'on_click': props['handler']})
 ```
 
-**Availble Props:**
+**Available Props:**
 
 
 | key | Type | Description |
 |------|------|---------|
 |label| string | The label displayed on the button |
+|label_markup | string | The label displayed on the button with [`wx.Control.SetLabelMarkup`](https://docs.wxpython.org/wx.Control.html?highlight=setlabelmarkup#wx.Control.SetLabelMarkup) |
 |background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
 |foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
 |font| wx.Font | Sets the Font used by this component and all of its children|
@@ -322,6 +329,49 @@ def example(props):
 
 <br />
 
+## DirPickerCtrl
+
+Control for choosing a directory path.
+
+A [`wx.DirPickerCtrl`](https://docs.wxpython.org/wx.DirPickerCtrl.html) with
+default style and with an added
+[`wx.FileDropTarget`](https://docs.wxpython.org/wx.FileDropTarget.html) for MS Windows.
+In GTK the `wx.DirPickerCtrl` will accept file drop events.
+
+**Example:**
+
+```python
+return wsx(
+    [ DirPickerCtrl, {
+        'path': '~`,
+        'on_change': handle_path_change,
+        }
+    ],
+```
+
+**Availble Props:**
+
+| key | Type | Description |
+|------|------|---------|
+|label| str | |
+|path | str | The currently selected path, if any.
+|on_change | callable | When the path changes, called with [`wx.FileDirPickerEvent`](https://docs.wxpython.org/wx.FileDirPickerEvent.html).
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|text_font| `wx.Font` | The font used for the `wx.TextControl` which is displayed for MS Windows.
+|tooltip| str | Displays a string when the user hovers over the component |
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+<br />
+
 ## ComboBox
 
 <p align="center">
@@ -362,6 +412,132 @@ def example(props):
 |flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
 |border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
 
+<br />
+
+## FilePickerCtrlOpen
+
+A [`wx.FilePickerCtrl`](https://docs.wxpython.org/wx.FilePickerCtrl.html)
+with default style `wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST`.
+
+**Example:**
+
+```python
+return wsx(
+    [ FilePickerCtrlOpen, {
+        'path': '~/file.txt`,
+        'on_change': handle_path_change,
+        }
+    ],
+```
+
+**Availble Props:**
+
+| key | Type | Description |
+|------|------|---------|
+|label| str | |
+|path | str | The currently selected path, if any.
+|on_change | callable | When the path changes, called with [`wx.FileDirPickerEvent`](https://docs.wxpython.org/wx.FileDirPickerEvent.html).
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component |
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+
+<br />
+
+## FilePickerCtrlSave
+
+A [`wx.FilePickerCtrl`](https://docs.wxpython.org/wx.FilePickerCtrl.html)
+with style `wx.FLP_SAVE`.
+
+**Example:**
+
+```python
+return wsx(
+    [ FilePickerCtrlOpen, {
+        'path': '~/file.txt',
+        'wildcard': '*.txt',
+        'on_change': handle_path_change,
+        }
+    ],
+```
+
+**Availble Props:**
+
+| key | Type | Description |
+|------|------|---------|
+|label| str | |
+|path | str | The currently selected path, if any.
+|on_change | callable | When the path changes, called with [`wx.FileDirPickerEvent`](https://docs.wxpython.org/wx.FileDirPickerEvent.html).
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component |
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|wildcard | str | A wildcard which defines user-selectable files. This prop, once set, cannot be changed.
+
+<br />
+
+## FlexGrid
+
+
+Like [Block](#Block), `FlexGrid` is a wrapped version of `wx.Panel` which automatically adds children to an internal [`wx.FlexGridSizer`](https://docs.wxpython.org/wx.FlexGridSizer.html).
+
+The `FlexGridSizer` “lays out its children in a two-dimensional table with all table fields in one row having the same height and all fields in one column having the same width, but all rows or all columns are not necessarily the same height or width as in the `wx.GridSizer`.”
+
+Use this for liquid grid layout like CSS `display:grid;`.
+
+**Example:**
+
+```python
+from components import FlexGrid, StaticText
+
+return wsx(
+    [FlexGrid, {
+        'cols': 2,
+        'gap': wx.Size(8,5),
+        },
+        [StaticText, {'label':'row 1 column 1'}],
+        [StaticText, {'label':'row 1 column 2'}],
+        [StaticText, {'label':'row 2 column 1'}],
+        [StaticText, {'label':'row 2 column 2'}],
+    ])
+```
+
+**Available Props:**
+
+
+| key | Type | Description |
+|------|------|---------|
+|cols| int | The number of columns in the grid |
+|gap| `wx.Size` | the size of the gap between grid items (`(horizontal, vertical)`) |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component |
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|on_click | callable | Calls the supplied function when this element is click. |
 
 <br />
 
@@ -522,7 +698,8 @@ def example(props):
     <img src="https://github.com/chriskiehl/re-wx-images/raw/images/wx_components/listctrl.PNG">
 </p>
 
-The `ListCtrl` in WX, while extremely powerful, has a super awkward and fiddly API. To tame this, re-wx only exposes a subset of the `ListCtrl`'s functionality and wraps it all up in a more declarative, straight forward API geared towards showing tables of information. However, if you need the full, unadultered power of `ListCtrl`, you can always use a `Ref` to grab a handle to the concrete wx instance.
+The [`wx.ListCtrl`](https://docs.wxpython.org/wx.ListCtrl.html),
+while extremely powerful, has a super awkward and fiddly API. To tame this, re-wx only exposes a subset of the `ListCtrl`'s functionality and wraps it all up in a more declarative, straight forward API geared towards showing tables of information. However, if you need the full, unadultered power of `ListCtrl`, you can always use a `Ref` to grab a handle to the concrete wx instance.
 
 
 **Example:**
@@ -807,6 +984,54 @@ def example(props):
 
 
 <br />
+
+## ScrolledPanel
+
+A [`wx.lib.scrolledpanel.ScrolledPanel`](https://docs.wxpython.org/wx.lib.scrolledpanel.ScrolledPanel.html)
+with a `wx.BoxSixer`.
+
+The [`OnChildFocus`](https://docs.wxpython.org/wx.lib.scrolledpanel.ScrolledPanel.html#wx.lib.scrolledpanel.ScrolledPanel.OnChildFocus)
+behavior is disabled.
+
+**Example:**
+
+```python
+wsx([ScrolledPanel, {
+        'scroll_x': False,
+        'scroll_y': True,
+        },
+        [StaticText, {'label': 'Hello world!'}]
+)
+```
+
+
+| key | Type | Description |
+|------|------|---------|
+|orient| int | Controls the direction of the sizer. `wx.HORIZONTAL` or `wx.VERTICAL` |
+|background_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|foreground_color| rgb value | Either an rgb tuple (e.g. `(255, 255, 255)` or a hex string (e.g. `"#ff00ff"`)|
+|font| wx.Font | Sets the Font used by this component and all of its children|
+|name| str | Adds the supplied name to the generated wx instance. This'll show in wx.Inspector and makes debugging much easier |
+|min_size| (int, int) | A tuple of (min_width, min_height). Use -1 to let WX auto-size the component.|
+|max_size| (int, int) | A tuple of (max_width, max_height). Use -1 to let WX auto-size the component.|
+|tooltip| str | Displays a string when the user hovers over the component |
+|show| boolean | Toggle whether this item is visible or not. |
+|enabled| boolean | Enables/Disables the component. |
+|style| any | style is context dependent |
+|proportion | int |  This parameter controls how much space this element will take up along the main axis of its parent sizer. 0 means don't grow at all, values > 0 cause it to scale proportionally relative to items with the same parent. See the [wx.Sizer docs for more info](https://www.wxpython.org/Phoenix/docs/html/sizers_overview.html#sizers-overview) |
+|flag | int | An ORd combination of flags which control the Sizer's behavior  (e.g. `{'flag': wx.LEFT \| wx.RIGHT}`)|
+|border | int | Sets the amount of border/padding which should be applied to the options specified in `flag` |
+|scroll_x | bool | `True` to allow horizontal scrolling
+|scroll_y | bool | `True` to allow vertical scrolling
+|rate_x | int | The horizontal scroll increment
+|rate_y | int | The vertical scroll increment
+|on_size | callable | Called when the size of the window changes
+|on_mouse_motion | callable | Called with `wx.MouseEvent` when the mouse position changes
+|on_mouse_wheel | callable | Called with `wx.MouseEvent` when the mouse wheel changes
+|on_scrollwin | callable | Called when the scroll position changes
+
+<br />
+
 
 ## Slider
 
