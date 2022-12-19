@@ -292,7 +292,7 @@ class DirPickerDropTarget(wx.FileDropTarget):
     """
     def __init__(self, dirPickerCtrl, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dirPickerCtrl = dirPickerCtrl 
+        self.dirPickerCtrl = dirPickerCtrl
     def OnDropFiles(self, x:int, y:int, filenames:list[str]):
         if len(filenames) == 1:
             path = filenames[0]
@@ -361,6 +361,7 @@ def file_picker_ctrl_open(element, instance: FilePickerCtrlOpen):
 @mount.register(FilePickerCtrlSave)
 def file_picker_ctrl_save(element, parent):
     props = element['props']
+    # TODO This default wildcard prop value is wrong, it should be maybe FileSelectorDefaultWildcardStr?
     return update(element, FilePickerCtrlSave(parent, style=wx.FLP_SAVE, wildcard=props.get('wildcard', '*.*')))
 
 @update.register(FilePickerCtrlSave)
