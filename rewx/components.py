@@ -135,7 +135,7 @@ class DirPickerCtrl(wx.DirPickerCtrl):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.self_managed = True # creates and destroys its own children
-    
+
     def _on_change_impl(self, event:wx.FileDirPickerEvent):
         if hasattr(self, '_on_change'):
             self._on_change(event.GetPath())
