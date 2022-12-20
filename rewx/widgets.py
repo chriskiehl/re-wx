@@ -480,7 +480,7 @@ def ListCtrl_GetColumnWidths(instance: wx.ListCtrl):
         wds.append(instance.GetColumnWidth(i))
     return wds
 
-def ListCtrl_SetColumnWidths(instance: wx.ListCtrl, wds: list[int]): # : List[int]):
+def ListCtrl_SetColumnWidths(instance: wx.ListCtrl, wds: list[int]):
     # no-op if the list of column widths is the wrong length
     if len(wds) == instance.GetColumnCount():
         for i in range(0, len(wds)):
