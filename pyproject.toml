@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "re-wx"
+version = "0.1.0"
+description = ""
+authors = ["Anthony Leotta <tony@leotta.com>"]
+readme = "README.md"
+packages = [{include = "re_wx"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+wxpython = "^4.2.0"
+typing-extensions = "^4.5.0"
+mypy-extensions = "^1.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
