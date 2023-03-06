@@ -275,9 +275,13 @@ def combobox(element, instance: wx.ComboBox) -> wx.Object:
     # to see if it's worth the effort.
     for _ in instance.GetItems():
         instance.Delete(0)
+
     instance.AppendItems(props.get('choices', []))
     if 'value' in element['props']:
-        instance.SetSelection(props['choices'].index(element['props'].get('value')))
+        try:
+            instance.SetSelection(props['choices'].index(element['props'].get('value')))
+        except:
+            pass
 
     if props.get('on_change'):
         instance.Bind(wx.EVT_COMBOBOX, props['on_change'])
