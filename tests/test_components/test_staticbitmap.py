@@ -81,5 +81,5 @@ class TestStaticBitmap(TestCase):
 
     def get_rgb(self, bitmap: wx.StaticBitmap):
         """Grab the rgb value of the first color in the image"""
-        bytes = wx.ImageFromBitmap(bitmap.GetBitmap()).GetData()
+        bytes = bitmap.GetBitmap().ConvertToImage().GetData()
         return tuple([x for x in bytes][:3])
